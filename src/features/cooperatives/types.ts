@@ -1,0 +1,1 @@
+// Cooperatives types
