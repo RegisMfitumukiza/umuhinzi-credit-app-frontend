@@ -74,7 +74,9 @@ export const EditFarmerProfileCard = ({ farmer }: Props) => {
   const onSubmit = (data: UpdateFarmerSchemaType) => {
     const payload: UpdateFarmerPayload = {
       ...(data.nationalId && { nationalId: data.nationalId }),
-      ...(data.dateOfBirth && { dateOfBirth: data.dateOfBirth }),
+      ...(data.dateOfBirth && {
+        dateOfBirth: new Date(data.dateOfBirth + "T00:00:00").toISOString(),
+      }),
       ...(data.gender && { gender: data.gender }),
       ...(data.farmingExperienceYears != null && {
         farmingExperienceYears: data.farmingExperienceYears,

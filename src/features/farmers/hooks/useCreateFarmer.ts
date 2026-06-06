@@ -8,8 +8,8 @@ export const useCreateFarmer = () => {
 
   return useMutation({
     mutationFn: (payload: CreateFarmerPayload) => createFarmerProfile(payload),
-    onSuccess: (res) => {
-      queryClient.setQueryData(["farmer", "me"], res.data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["farmer", "me"] });
     },
   });
 };

@@ -35,7 +35,9 @@ export const CreateFarmerProfileForm = () => {
   const onSubmit = (data: CreateFarmerSchemaType) => {
     const payload: CreateFarmerPayload = {
       nationalId: data.nationalId,
-      ...(data.dateOfBirth && { dateOfBirth: data.dateOfBirth }),
+      ...(data.dateOfBirth && {
+        dateOfBirth: new Date(data.dateOfBirth + "T00:00:00").toISOString(),
+      }),
       ...(data.gender && { gender: data.gender }),
       ...(data.farmingExperienceYears != null && {
         farmingExperienceYears: data.farmingExperienceYears,
