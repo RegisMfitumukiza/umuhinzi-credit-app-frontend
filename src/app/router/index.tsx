@@ -10,6 +10,9 @@ import {
   UnauthorizedPage,
 } from "@/features/auth";
 
+import CooperativeDashboard from "@/features/cooperatives/pages/CooperativeDashboard";
+import FarmerDashboard from "@/features/farmers/pages/FarmerDashboard";
+import FarmsPage from "@/features/farms/pages/FarmsPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
 import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
@@ -21,9 +24,7 @@ import { ROUTES } from "@/shared/constants/routes";
 /* ─── Placeholder dashboards (replace as features are built) ─── */
 const HomePage = () => <div>Home Page</div>;
 const AdminDashboard = () => <div>Admin Dashboard</div>;
-const FarmerDashboard = () => <div>Farmer Dashboard</div>;
 const InstitutionDashboard = () => <div>Institution Dashboard</div>;
-const CooperativeDashboard = () => <div>Cooperative Dashboard</div>;
 const GovernmentDashboard = () => <div>Government Dashboard</div>;
 
 export const AppRouter = () => {
@@ -61,6 +62,7 @@ export const AppRouter = () => {
           {/* FARMER */}
           <Route element={<RoleGuard allowedRoles={["FARMER"]} />}>
             <Route path={ROUTES.FARMER_DASHBOARD} element={<FarmerDashboard />} />
+            <Route path={ROUTES.FARMER_FARMS} element={<FarmsPage />} />
           </Route>
 
           {/* INSTITUTION */}
