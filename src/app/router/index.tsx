@@ -10,50 +10,21 @@ import {
   UnauthorizedPage,
 } from "@/features/auth";
 
+import LoginPage from "@/features/auth/pages/LoginPage";
+import RegisterPage from "@/features/auth/pages/RegisterPage";
+import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
+import VerifyEmailPage from "@/features/auth/pages/VerifyEmailPage";
+
 import { ROUTES } from "@/shared/constants/routes";
 
-/**
- * Temporary pages.
- * Replace these with real pages as we build features.
- */
-
+/* ─── Placeholder dashboards (replace as features are built) ─── */
 const HomePage = () => <div>Home Page</div>;
-
-const LoginPage = () => <div>Login Page</div>;
-
-const RegisterPage = () => <div>Register Page</div>;
-
-const ForgotPasswordPage = () => (
-  <div>Forgot Password Page</div>
-);
-
-const ResetPasswordPage = () => (
-  <div>Reset Password Page</div>
-);
-
-const VerifyEmailPage = () => (
-  <div>Verify Email Page</div>
-);
-
-const AdminDashboard = () => (
-  <div>Admin Dashboard</div>
-);
-
-const FarmerDashboard = () => (
-  <div>Farmer Dashboard</div>
-);
-
-const InstitutionDashboard = () => (
-  <div>Institution Dashboard</div>
-);
-
-const CooperativeDashboard = () => (
-  <div>Cooperative Dashboard</div>
-);
-
-const GovernmentDashboard = () => (
-  <div>Government Dashboard</div>
-);
+const AdminDashboard = () => <div>Admin Dashboard</div>;
+const FarmerDashboard = () => <div>Farmer Dashboard</div>;
+const InstitutionDashboard = () => <div>Institution Dashboard</div>;
+const CooperativeDashboard = () => <div>Cooperative Dashboard</div>;
+const GovernmentDashboard = () => <div>Government Dashboard</div>;
 
 export const AppRouter = () => {
   return (
@@ -61,91 +32,39 @@ export const AppRouter = () => {
       {/* PUBLIC ROUTES */}
 
       <Route element={<PublicLayout />}>
-        <Route
-          path={ROUTES.HOME}
-          element={<HomePage />}
-        />
+        <Route path={ROUTES.HOME} element={<HomePage />} />
       </Route>
 
       {/* AUTH ROUTES */}
 
       <Route element={<AuthLayout />}>
-        <Route
-          path={ROUTES.LOGIN}
-          element={<LoginPage />}
-        />
-
-        <Route
-          path={ROUTES.REGISTER}
-          element={<RegisterPage />}
-        />
-
-        <Route
-          path={ROUTES.FORGOT_PASSWORD}
-          element={<ForgotPasswordPage />}
-        />
-
-        <Route
-          path={ROUTES.RESET_PASSWORD}
-          element={<ResetPasswordPage />}
-        />
-
-        <Route
-          path={ROUTES.VERIFY_EMAIL}
-          element={<VerifyEmailPage />}
-        />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+        <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
       </Route>
 
       {/* UNAUTHORIZED */}
 
-      <Route
-        path={ROUTES.UNAUTHORIZED}
-        element={<UnauthorizedPage />}
-      />
+      <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
 
       {/* PROTECTED ROUTES */}
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           {/* ADMIN */}
-
-          <Route
-            element={
-              <RoleGuard
-                allowedRoles={["ADMIN"]}
-              />
-            }
-          >
-            <Route
-              path={ROUTES.ADMIN_DASHBOARD}
-              element={<AdminDashboard />}
-            />
+          <Route element={<RoleGuard allowedRoles={["ADMIN"]} />}>
+            <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
           </Route>
 
           {/* FARMER */}
-
-          <Route
-            element={
-              <RoleGuard
-                allowedRoles={["FARMER"]}
-              />
-            }
-          >
-            <Route
-              path={ROUTES.FARMER_DASHBOARD}
-              element={<FarmerDashboard />}
-            />
+          <Route element={<RoleGuard allowedRoles={["FARMER"]} />}>
+            <Route path={ROUTES.FARMER_DASHBOARD} element={<FarmerDashboard />} />
           </Route>
 
           {/* INSTITUTION */}
-
-          <Route
-            element={
-              <RoleGuard
-                allowedRoles={["INSTITUTION"]}
-              />
-            }
-          >
+          <Route element={<RoleGuard allowedRoles={["INSTITUTION"]} />}>
             <Route
               path={ROUTES.INSTITUTION_DASHBOARD}
               element={<InstitutionDashboard />}
@@ -153,44 +72,18 @@ export const AppRouter = () => {
           </Route>
 
           {/* COOPERATIVE */}
-
-          <Route
-            element={
-              <RoleGuard
-                allowedRoles={[
-                  "COOPERATIVE_MANAGER",
-                ]}
-              />
-            }
-          >
+          <Route element={<RoleGuard allowedRoles={["COOPERATIVE_MANAGER"]} />}>
             <Route
-              path={
-                ROUTES.COOPERATIVE_DASHBOARD
-              }
-              element={
-                <CooperativeDashboard />
-              }
+              path={ROUTES.COOPERATIVE_DASHBOARD}
+              element={<CooperativeDashboard />}
             />
           </Route>
 
           {/* GOVERNMENT */}
-
-          <Route
-            element={
-              <RoleGuard
-                allowedRoles={[
-                  "GOVERNMENT_PARTNER",
-                ]}
-              />
-            }
-          >
+          <Route element={<RoleGuard allowedRoles={["GOVERNMENT_PARTNER"]} />}>
             <Route
-              path={
-                ROUTES.GOVERNMENT_DASHBOARD
-              }
-              element={
-                <GovernmentDashboard />
-              }
+              path={ROUTES.GOVERNMENT_DASHBOARD}
+              element={<GovernmentDashboard />}
             />
           </Route>
         </Route>
@@ -198,15 +91,7 @@ export const AppRouter = () => {
 
       {/* 404 */}
 
-      <Route
-        path="*"
-        element={
-          <Navigate
-            to={ROUTES.HOME}
-            replace
-          />
-        }
-      />
+      <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
     </Routes>
   );
 };

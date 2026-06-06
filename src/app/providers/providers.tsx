@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -9,20 +8,8 @@ import { TooltipProvider } from "@/shared/components/ui/tooltip";
 import { Toaster } from "@/shared/components/ui/sonner";
 
 import { AuthProvider } from "@/features/auth";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5,
-    },
-
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+import { queryClient } from "@/lib/query-client";
+import { ThemeProvider } from "next-themes";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -34,14 +21,21 @@ export const AppProviders = ({
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            {children}
 
-          <Toaster
-            richColors
-            position="top-right"
-          />
-        </AuthProvider>
+            <Toaster
+              richColors
+              position="top-right"
+            />
+          </AuthProvider>
+        </ThemeProvider>
 
         <ReactQueryDevtools
           initialIsOpen={false}
