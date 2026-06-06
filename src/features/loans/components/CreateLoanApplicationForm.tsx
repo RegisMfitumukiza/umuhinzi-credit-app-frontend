@@ -1,18 +1,11 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/shared/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import {
   Select,
@@ -36,7 +29,13 @@ interface Props {
 export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
   const { mutate, isPending } = useCreateLoanApplication();
 
-  const form = useForm<CreateLoanApplicationSchemaType>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateLoanApplicationSchemaType>({
     resolver: zodResolver(createLoanApplicationSchema),
     defaultValues: {
       requestedAmount: undefined,
@@ -53,7 +52,7 @@ export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
     mutate(payload, {
       onSuccess: () => {
         toast.success("Loan application submitted.");
-        form.reset();
+        reset();
         onSuccess?.();
       },
       onError: (err) => toast.error(err.message),
@@ -61,80 +60,67 @@ export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="requestedAmount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Requested amount (RWF)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  step={1000}
-                  placeholder="e.g. 500000"
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-1.5">
+        <Label htmlFor="requestedAmount">Requested amount (RWF)</Label>
+        <Input
+          id="requestedAmount"
+          type="number"
+          min={0}
+          step={1000}
+          placeholder="e.g. 500000"
+          {...register("requestedAmount", { valueAsNumber: true })}
         />
+        {errors.requestedAmount && (
+          <p className="text-sm text-destructive">{errors.requestedAmount.message}</p>
+        )}
+      </div>
 
-        <FormField
-          control={form.control}
+      <div className="space-y-1.5">
+        <Label>Purpose</Label>
+        <Controller
           name="purpose"
+          control={control}
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Purpose</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select purpose" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {(Object.entries(LOAN_PURPOSE_LABELS) as [string, string][]).map(
-                    ([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select purpose" />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.entries(LOAN_PURPOSE_LABELS) as [string, string][]).map(
+                  ([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  )
+                )}
+              </SelectContent>
+            </Select>
           )}
         />
+        {errors.purpose && (
+          <p className="text-sm text-destructive">{errors.purpose.message}</p>
+        )}
+      </div>
 
-        <FormField
-          control={form.control}
-          name="purposeDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description (optional)</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe how you plan to use the loan…"
-                  className="resize-none"
-                  rows={3}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="space-y-1.5">
+        <Label htmlFor="purposeDescription">Description (optional)</Label>
+        <Textarea
+          id="purposeDescription"
+          placeholder="Describe how you plan to use the loan…"
+          className="resize-none"
+          rows={3}
+          {...register("purposeDescription")}
         />
+        {errors.purposeDescription && (
+          <p className="text-sm text-destructive">{errors.purposeDescription.message}</p>
+        )}
+      </div>
 
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Submit application
-        </Button>
-      </form>
-    </Form>
+      <Button type="submit" className="w-full" disabled={isPending}>
+        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Submit application
+      </Button>
+    </form>
   );
 };

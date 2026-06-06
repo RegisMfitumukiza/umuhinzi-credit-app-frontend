@@ -11,15 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 
 import { useDisburseLoan } from "../hooks/useDisburseLoan";
 import {
@@ -36,7 +29,11 @@ interface Props {
 
 export const DisburseDialog = ({ loan, open, onOpenChange }: Props) => {
   const { mutate, isPending } = useDisburseLoan();
-  const form = useForm<DisburseLoanSchemaType>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<DisburseLoanSchemaType>({
     resolver: zodResolver(disburseLoanSchema),
     defaultValues: {
       disbursedAmount: loan.principalAmount,
@@ -86,76 +83,56 @@ export const DisburseDialog = ({ loan, open, onOpenChange }: Props) => {
           )}
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="disbursedAmount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Disbursed amount (RWF)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="disbursedAmount">Disbursed amount (RWF)</Label>
+            <Input
+              id="disbursedAmount"
+              type="number"
+              min={0}
+              {...register("disbursedAmount", { valueAsNumber: true })}
             />
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Start date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="durationMonths"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Duration (months)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={120}
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {errors.disbursedAmount && (
+              <p className="text-sm text-destructive">{errors.disbursedAmount.message}</p>
+            )}
+          </div>
 
-            <DialogFooter>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Disburse
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          <div className="space-y-1.5">
+            <Label htmlFor="startDate">Start date</Label>
+            <Input id="startDate" type="date" {...register("startDate")} />
+            {errors.startDate && (
+              <p className="text-sm text-destructive">{errors.startDate.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="durationMonths">Duration (months)</Label>
+            <Input
+              id="durationMonths"
+              type="number"
+              min={1}
+              max={120}
+              {...register("durationMonths", { valueAsNumber: true })}
+            />
+            {errors.durationMonths && (
+              <p className="text-sm text-destructive">{errors.durationMonths.message}</p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Disburse
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

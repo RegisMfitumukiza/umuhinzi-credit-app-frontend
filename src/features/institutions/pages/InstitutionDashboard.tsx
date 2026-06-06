@@ -7,7 +7,6 @@ import { AppLoader } from "@/shared/components/common/AppLoader";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";

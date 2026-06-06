@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -11,15 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import {
   Select,
@@ -57,7 +50,13 @@ export const ReviewApplicationDialog = ({
   allowedStatusMoves,
 }: Props) => {
   const { mutate, isPending } = useUpdateLoanApplicationStatus();
-  const form = useForm<UpdateLoanApplicationStatusSchemaType>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<UpdateLoanApplicationStatusSchemaType>({
     resolver: zodResolver(updateLoanApplicationStatusSchema),
     defaultValues: {
       status: allowedStatusMoves[0],
@@ -69,7 +68,7 @@ export const ReviewApplicationDialog = ({
     },
   });
 
-  const watchedStatus = form.watch("status");
+  const watchedStatus = watch("status");
   const isApproving = watchedStatus === "APPROVED";
   const isRejecting = watchedStatus === "REJECTED";
 
@@ -136,132 +135,115 @@ export const ReviewApplicationDialog = ({
 
         <Separator />
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>New status</Label>
+            <Controller
               name="status"
+              control={control}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New status</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {allowedStatusMoves.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s === "UNDER_REVIEW"
-                            ? "Move to Under Review"
-                            : s === "APPROVED"
-                              ? "Approve"
-                              : s === "REJECTED"
-                                ? "Reject"
-                                : "Cancel"}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allowedStatusMoves.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s === "UNDER_REVIEW"
+                          ? "Move to Under Review"
+                          : s === "APPROVED"
+                            ? "Approve"
+                            : s === "REJECTED"
+                              ? "Reject"
+                              : "Cancel"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             />
-
-            {isApproving && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="approvedAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Approved amount (RWF){" "}
-                        <span className="text-xs text-muted-foreground">
-                          — defaults to requested
-                        </span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          placeholder={String(application.requestedAmount)}
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="interestRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Interest rate (%){" "}
-                        <span className="text-xs text-muted-foreground">
-                          — optional, default 0%
-                        </span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          max={100}
-                          step={0.1}
-                          placeholder="0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
+            {errors.status && (
+              <p className="text-sm text-destructive">{errors.status.message}</p>
             )}
+          </div>
 
-            {isRejecting && (
-              <FormField
-                control={form.control}
-                name="rejectionReason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rejection reason</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Explain why the application is being rejected…"
-                        className="resize-none"
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+          {isApproving && (
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor="approvedAmount">
+                  Approved amount (RWF){" "}
+                  <span className="text-xs text-muted-foreground">
+                    — defaults to requested
+                  </span>
+                </Label>
+                <Input
+                  id="approvedAmount"
+                  type="number"
+                  min={0}
+                  placeholder={String(application.requestedAmount)}
+                  {...register("approvedAmount", {
+                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                  })}
+                />
+                {errors.approvedAmount && (
+                  <p className="text-sm text-destructive">{errors.approvedAmount.message}</p>
                 )}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="interestRate">
+                  Interest rate (%){" "}
+                  <span className="text-xs text-muted-foreground">
+                    — optional, default 0%
+                  </span>
+                </Label>
+                <Input
+                  id="interestRate"
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.1}
+                  placeholder="0"
+                  {...register("interestRate", {
+                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                  })}
+                />
+                {errors.interestRate && (
+                  <p className="text-sm text-destructive">{errors.interestRate.message}</p>
+                )}
+              </div>
+            </>
+          )}
+
+          {isRejecting && (
+            <div className="space-y-1.5">
+              <Label htmlFor="rejectionReason">Rejection reason</Label>
+              <Textarea
+                id="rejectionReason"
+                placeholder="Explain why the application is being rejected…"
+                className="resize-none"
+                rows={3}
+                {...register("rejectionReason")}
               />
-            )}
+              {errors.rejectionReason && (
+                <p className="text-sm text-destructive">{errors.rejectionReason.message}</p>
+              )}
+            </div>
+          )}
 
-            <DialogFooter>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
