@@ -10,12 +10,9 @@ export const useLogout = () => {
     return useMutation({
         mutationFn: logoutUser,
 
-        onSuccess: () => {
+        onSettled: () => {
             authStorage.clear();
-
-            queryClient.invalidateQueries({
-                queryKey: ["auth-user"]
-            })
+            queryClient.setQueryData(["auth-user"], null);
         }
     })
 }

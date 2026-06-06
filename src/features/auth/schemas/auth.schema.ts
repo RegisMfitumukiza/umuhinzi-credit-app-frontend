@@ -40,6 +40,14 @@ export const registerSchema = z.object({
     "COOPERATIVE_MANAGER",
     "GOVERNMENT_PARTNER",
   ]),
+}).superRefine((data, ctx) => {
+  if (data.role === "GOVERNMENT_PARTNER" && !data.email.endsWith(".gov.rw")) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["email"],
+      message: "Government partner accounts require an official .gov.rw email address",
+    });
+  }
 });
 
 export const loginSchema = z.object({

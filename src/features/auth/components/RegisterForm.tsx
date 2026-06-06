@@ -113,9 +113,13 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           autoComplete="email"
           {...field("email")}
         />
-        {errors.email && (
+        {errors.email ? (
           <p className="text-sm text-destructive">{errors.email.message}</p>
-        )}
+        ) : selectedRole === "GOVERNMENT_PARTNER" ? (
+          <p className="text-sm text-muted-foreground">
+            Requires an official <span className="font-medium">.gov.rw</span> email address
+          </p>
+        ) : null}
       </div>
 
       <div className="space-y-1.5">
