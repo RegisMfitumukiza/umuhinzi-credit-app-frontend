@@ -1,14 +1,8 @@
-import { AlertCircle, Clock, ShieldOff, Tractor } from "lucide-react";
+import { Clock, ShieldOff, Tractor } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/components/ui/card";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { ROUTES } from "@/shared/constants/routes";
 

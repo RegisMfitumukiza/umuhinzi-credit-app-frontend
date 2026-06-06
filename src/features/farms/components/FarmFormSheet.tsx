@@ -29,9 +29,7 @@ import { useCreateFarm } from "../hooks/useCreateFarm";
 import { useUpdateFarm } from "../hooks/useUpdateFarm";
 import {
   createFarmSchema,
-  updateFarmSchema,
   type CreateFarmSchemaType,
-  type UpdateFarmSchemaType,
 } from "../schemas/farm.schema";
 import type { CreateFarmPayload, Farm, UpdateFarmPayload } from "../types";
 
@@ -40,21 +38,19 @@ type Props = {
   children: React.ReactNode;
 };
 
-const LOCATION_FIELDS = new Set([
-  "province",
-  "district",
-  "sector",
-  "cell",
-  "village",
-  "latitude",
-  "longitude",
+// Fields that trigger UNDER_REVIEW on the backend when changed
+const REVIEW_FIELDS = new Set([
+  "landSize", "landUnit", "ownershipType",
+  "province", "district", "sector", "cell", "village",
+  "latitude", "longitude",
 ]);
 
-const LAND_FIELDS = new Set([
-  "landSize",
-  "landUnit",
-  "ownershipType",
-]);
+// Convert empty / NaN to undefined for optional numeric inputs
+const toOptionalNumber = (v: unknown): number | undefined => {
+  if (v === "" || v === null || v === undefined) return undefined;
+  const n = Number(v);
+  return isNaN(n) ? undefined : n;
+};
 
 export const FarmFormSheet = ({ farm, children }: Props) => {
   const [open, setOpen] = useState(false);
@@ -68,18 +64,15 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
   const isPending = isCreating || isUpdating;
   const apiError = createError ?? updateError;
 
-  const schema = isEdit ? updateFarmSchema : createFarmSchema;
-
   const {
     register,
     control,
     handleSubmit,
     setValue,
-    getValues,
     reset,
     formState: { errors, dirtyFields },
-  } = useForm<CreateFarmSchemaType | UpdateFarmSchemaType>({
-    resolver: zodResolver(schema),
+  } = useForm<CreateFarmSchemaType>({
+    resolver: zodResolver(createFarmSchema),
     defaultValues: farm
       ? {
           name: farm.name,
@@ -127,28 +120,23 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
   };
 
   const willResetToReview = isEdit
-    ? Object.keys(dirtyFields).some(
-        (k) => LOCATION_FIELDS.has(k) || LAND_FIELDS.has(k)
-      )
+    ? Object.keys(dirtyFields).some((k) => REVIEW_FIELDS.has(k))
     : false;
 
-  const buildPayload = (
-    data: CreateFarmSchemaType | UpdateFarmSchemaType
-  ): CreateFarmPayload | UpdateFarmPayload => ({
-    ...data,
-    description: (data as CreateFarmSchemaType).description || undefined,
-    province: (data as CreateFarmSchemaType).province || undefined,
-    sector: (data as CreateFarmSchemaType).sector || undefined,
-    cell: (data as CreateFarmSchemaType).cell || undefined,
-    village: (data as CreateFarmSchemaType).village || undefined,
-  });
-
-  const onSubmit = (data: CreateFarmSchemaType | UpdateFarmSchemaType) => {
-    const payload = buildPayload(data);
-
+  const onSubmit = (data: CreateFarmSchemaType) => {
     if (isEdit && farm) {
+      // Send only changed fields to avoid unnecessary UNDER_REVIEW resets
+      const payload: UpdateFarmPayload = {};
+      const dirty = dirtyFields as Record<string, boolean | undefined>;
+      (Object.keys(dirty) as (keyof CreateFarmSchemaType)[]).forEach((key) => {
+        if (!dirty[key as string]) return;
+        const val = data[key];
+        (payload as Record<string, unknown>)[key] =
+          typeof val === "string" && val === "" ? undefined : val;
+      });
+
       updateMutate(
-        { id: farm.id, payload: payload as UpdateFarmPayload },
+        { id: farm.id, payload },
         {
           onSuccess: () => {
             toast.success("Farm updated.");
@@ -157,11 +145,17 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
         }
       );
     } else {
-      createMutate(payload as CreateFarmPayload, {
+      const payload: CreateFarmPayload = {
+        ...data,
+        description: data.description || undefined,
+        province: data.province || undefined,
+        sector: data.sector || undefined,
+        cell: data.cell || undefined,
+        village: data.village || undefined,
+      };
+      createMutate(payload, {
         onSuccess: () => {
-          toast.success(
-            "Farm created. It's now under review by an admin.",
-          );
+          toast.success("Farm created. It's now under review by an admin.");
           reset();
           setOpen(false);
         },
@@ -178,8 +172,8 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
           <SheetTitle>{isEdit ? "Edit farm" : "Add a farm"}</SheetTitle>
           <SheetDescription>
             {isEdit
-              ? "Update the farm details below."
-              : "Fill in your farm details. Only name, size, and district are required."}
+              ? "Only changed fields will be saved."
+              : "Name, land size, and district are required."}
           </SheetDescription>
         </SheetHeader>
 
@@ -191,11 +185,8 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
           </div>
         )}
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mt-4 space-y-6 pb-8"
-        >
-          {/* ── Basic info ── */}
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-6 pb-8">
+          {/* ── Basic ── */}
           <section className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Basic info
@@ -211,9 +202,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">
-                  {errors.name.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.name.message}</p>
               )}
             </div>
 
@@ -230,7 +219,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
 
           <Separator />
 
-          {/* ── Land details ── */}
+          {/* ── Land ── */}
           <section className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Land details
@@ -247,7 +236,10 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                   step="0.01"
                   min="0"
                   placeholder="e.g. 2.5"
-                  {...register("landSize")}
+                  {...register("landSize", {
+                    setValueAs: (v) =>
+                      v === "" ? undefined : parseFloat(v as string),
+                  })}
                 />
                 {errors.landSize && (
                   <p className="text-sm text-destructive">
@@ -262,10 +254,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                   name="landUnit"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value as string}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -282,15 +271,12 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Ownership type</Label>
+                <Label>Ownership</Label>
                 <Controller
                   name="ownershipType"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value as string}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -298,12 +284,8 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                         <SelectItem value="OWNED">Owned</SelectItem>
                         <SelectItem value="RENTED">Rented</SelectItem>
                         <SelectItem value="FAMILY_LAND">Family land</SelectItem>
-                        <SelectItem value="COOPERATIVE_LAND">
-                          Cooperative land
-                        </SelectItem>
-                        <SelectItem value="GOVERNMENT_ALLOCATED">
-                          Gov. allocated
-                        </SelectItem>
+                        <SelectItem value="COOPERATIVE_LAND">Cooperative</SelectItem>
+                        <SelectItem value="GOVERNMENT_ALLOCATED">Gov. allocated</SelectItem>
                         <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>
@@ -317,10 +299,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                   name="soilType"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value as string}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -417,7 +396,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
             </div>
 
             <p className="text-xs text-muted-foreground -mt-1">
-              GPS helps verify your farm location. Both fields must be filled together.
+              Helps admins verify your farm. Both fields must be filled together.
             </p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -428,7 +407,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                   type="number"
                   step="any"
                   placeholder="-1.9441"
-                  {...register("latitude")}
+                  {...register("latitude", { setValueAs: toOptionalNumber })}
                 />
                 {errors.latitude && (
                   <p className="text-sm text-destructive">
@@ -444,7 +423,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
                   type="number"
                   step="any"
                   placeholder="30.0619"
-                  {...register("longitude")}
+                  {...register("longitude", { setValueAs: toOptionalNumber })}
                 />
                 {errors.longitude && (
                   <p className="text-sm text-destructive">
@@ -471,9 +450,7 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
               Cancel
             </Button>
             <Button type="submit" disabled={isPending} className="flex-1">
-              {isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isEdit ? "Save changes" : "Create farm"}
             </Button>
           </div>
