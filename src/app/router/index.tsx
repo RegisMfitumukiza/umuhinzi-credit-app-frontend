@@ -13,7 +13,13 @@ import {
 import CooperativeDashboard from "@/features/cooperatives/pages/CooperativeDashboard";
 import FarmerDashboard from "@/features/farmers/pages/FarmerDashboard";
 import FarmsPage from "@/features/farms/pages/FarmsPage";
+import FarmerLoansPage from "@/features/loans/pages/FarmerLoansPage";
+import AdminLoansPage from "@/features/loans/pages/AdminLoansPage";
+import InstitutionLoansPage from "@/features/loans/pages/InstitutionLoansPage";
 import InstitutionDashboard from "@/features/institutions/pages/InstitutionDashboard";
+import AdminUsersPage from "@/features/users/pages/AdminUsersPage";
+import UserProfilePage from "@/features/users/pages/UserProfilePage";
+import NotificationsPage from "@/features/notifications/pages/NotificationsPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
 import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
@@ -24,7 +30,6 @@ import { ROUTES } from "@/shared/constants/routes";
 
 /* ─── Placeholder dashboards (replace as features are built) ─── */
 const HomePage = () => <div>Home Page</div>;
-const AdminDashboard = () => <div>Admin Dashboard</div>;
 const GovernmentDashboard = () => <div>Government Dashboard</div>;
 
 export const AppRouter = () => {
@@ -54,15 +59,21 @@ export const AppRouter = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
+          {/* ALL AUTHENTICATED — accessible to every role */}
+          <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
+          <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
+
           {/* ADMIN */}
           <Route element={<RoleGuard allowedRoles={["ADMIN"]} />}>
-            <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
+            <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminUsersPage />} />
+            <Route path={ROUTES.ADMIN_LOANS} element={<AdminLoansPage />} />
           </Route>
 
           {/* FARMER */}
           <Route element={<RoleGuard allowedRoles={["FARMER"]} />}>
             <Route path={ROUTES.FARMER_DASHBOARD} element={<FarmerDashboard />} />
             <Route path={ROUTES.FARMER_FARMS} element={<FarmsPage />} />
+            <Route path={ROUTES.FARMER_LOANS} element={<FarmerLoansPage />} />
           </Route>
 
           {/* INSTITUTION */}
@@ -70,6 +81,10 @@ export const AppRouter = () => {
             <Route
               path={ROUTES.INSTITUTION_DASHBOARD}
               element={<InstitutionDashboard />}
+            />
+            <Route
+              path={ROUTES.INSTITUTION_LOANS}
+              element={<InstitutionLoansPage />}
             />
           </Route>
 

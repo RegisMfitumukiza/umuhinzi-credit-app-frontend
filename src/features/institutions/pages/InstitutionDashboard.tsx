@@ -1,4 +1,7 @@
 import { AlertCircle, Clock, ShieldOff } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/shared/components/ui/button";
+import { ROUTES } from "@/shared/constants/routes";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
 import {
@@ -149,13 +152,15 @@ const ActiveView = ({ institution }: { institution: Institution }) => (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Loan services</CardTitle>
-            <CardDescription>Coming soon</CardDescription>
           </CardHeader>
           <Separator />
-          <CardContent className="pt-4">
+          <CardContent className="pt-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Loan disbursement and portfolio management features will appear here once enabled.
+              Review applications, approve and disburse loans for farmers in your portfolio.
             </p>
+            <Button asChild variant="outline" size="sm">
+              <Link to={ROUTES.INSTITUTION_LOANS}>Manage loans</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

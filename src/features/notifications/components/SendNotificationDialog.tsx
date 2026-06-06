@@ -1,0 +1,239 @@
+import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Send } from "lucide-react";
+import { z } from "zod";
+import { toast } from "sonner";
+
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { Textarea } from "@/shared/components/ui/textarea";
+
+import { useSendNotification } from "../hooks/useSendNotification";
+import { NOTIFICATION_TYPE_LABELS, type NotificationPriority, type NotificationType } from "../types";
+
+const schema = z.object({
+  userId: z.string().uuid("Must be a valid user UUID"),
+  type: z.enum([
+    "LOAN_APPROVAL",
+    "REPAYMENT_REMINDER",
+    "CREDIT_SCORE_UPDATE",
+    "MISSING_DATA_ALERT",
+    "COOPERATIVE_ANNOUNCEMENT",
+    "SYSTEM",
+    "GENERAL",
+  ] as const),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"] as const).optional(),
+  title: z
+    .string()
+    .trim()
+    .min(2, "At least 2 characters")
+    .max(120, "Max 120 characters"),
+  message: z
+    .string()
+    .trim()
+    .min(5, "At least 5 characters")
+    .max(1000, "Max 1000 characters"),
+  actionUrl: z.string().trim().max(300).optional().or(z.literal("")),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+export const SendNotificationDialog = () => {
+  const [open, setOpen] = useState(false);
+  const { mutate, isPending } = useSendNotification();
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { type: "GENERAL", priority: "MEDIUM" },
+  });
+
+  const onSubmit = (data: FormValues) => {
+    mutate(
+      {
+        userId: data.userId,
+        type: data.type as NotificationType,
+        priority: data.priority as NotificationPriority | undefined,
+        title: data.title,
+        message: data.message,
+        ...(data.actionUrl && { actionUrl: data.actionUrl }),
+      },
+      {
+        onSuccess: () => {
+          toast.success("Notification sent.");
+          reset();
+          setOpen(false);
+        },
+        onError: (err) => toast.error(err.message),
+      }
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="gap-1.5">
+          <Send className="h-4 w-4" />
+          Send notification
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Send notification</DialogTitle>
+          <DialogDescription>
+            Send a manual notification to a specific user. Paste their exact user UUID.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* User ID */}
+          <div className="space-y-1.5">
+            <Label htmlFor="userId">
+              User ID <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="userId"
+              placeholder="User UUID"
+              {...register("userId")}
+            />
+            {errors.userId && (
+              <p className="text-sm text-destructive">{errors.userId.message}</p>
+            )}
+          </div>
+
+          {/* Type + Priority row */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>
+                Type <span className="text-destructive">*</span>
+              </Label>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(Object.entries(NOTIFICATION_TYPE_LABELS) as [NotificationType, string][]).map(
+                        ([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.type && (
+                <p className="text-sm text-destructive">{errors.type.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Priority</Label>
+              <Controller
+                name="priority"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value ?? "MEDIUM"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="LOW">Low</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                      <SelectItem value="URGENT">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="space-y-1.5">
+            <Label htmlFor="title">
+              Title <span className="text-destructive">*</span>
+            </Label>
+            <Input id="title" placeholder="Notification title" {...register("title")} />
+            {errors.title && (
+              <p className="text-sm text-destructive">{errors.title.message}</p>
+            )}
+          </div>
+
+          {/* Message */}
+          <div className="space-y-1.5">
+            <Label htmlFor="message">
+              Message <span className="text-destructive">*</span>
+            </Label>
+            <Textarea
+              id="message"
+              placeholder="Write the notification message…"
+              rows={3}
+              {...register("message")}
+            />
+            {errors.message && (
+              <p className="text-sm text-destructive">{errors.message.message}</p>
+            )}
+          </div>
+
+          {/* Action URL */}
+          <div className="space-y-1.5">
+            <Label htmlFor="actionUrl">Action URL (optional)</Label>
+            <Input
+              id="actionUrl"
+              placeholder="https://…"
+              {...register("actionUrl")}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending} className="gap-1.5">
+              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Send
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};

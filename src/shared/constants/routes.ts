@@ -23,4 +23,14 @@ export const ROUTES = {
   GOVERNMENT_DASHBOARD: "/government",
 
   FARMER_FARMS: "/farmer/farms",
+
+  FARMER_LOANS: "/farmer/loans",
+
+  ADMIN_LOANS: "/admin/loans",
+
+  INSTITUTION_LOANS: "/institution/loans",
+
+  PROFILE: "/profile",
+
+  NOTIFICATIONS: "/notifications",
 } as const;

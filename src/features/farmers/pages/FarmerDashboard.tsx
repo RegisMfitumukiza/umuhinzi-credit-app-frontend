@@ -1,4 +1,4 @@
-import { Clock, ShieldOff, Tractor } from "lucide-react";
+import { Clock, ShieldOff, Tractor, Banknote } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
@@ -45,6 +45,7 @@ const FarmerDashboard = () => {
       {farmer.status === "SUSPENDED" && <SuspendedBanner />}
       <MainGrid farmer={farmer} />
       <FarmsCard farmer={farmer} />
+      <LoansCard />
       <CooperativeSection farmer={farmer} />
     </div>
   );
@@ -95,6 +96,31 @@ const SuspendedBanner = () => (
       </p>
     </div>
   </div>
+);
+
+/* ─── Loans quick-access card ─── */
+
+const LoansCard = () => (
+  <Card>
+    <CardContent className="flex items-center justify-between gap-4 py-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+          <Banknote className="h-5 w-5 text-blue-700" />
+        </div>
+        <div>
+          <p className="font-medium">Agricultural loans</p>
+          <p className="text-sm text-muted-foreground">
+            Apply for credit, track repayments, and view your loan schedule
+          </p>
+        </div>
+      </div>
+      <Button asChild variant="outline" className="shrink-0">
+        <Link to={ROUTES.FARMER_LOANS}>
+          View loans
+        </Link>
+      </Button>
+    </CardContent>
+  </Card>
 );
 
 /* ─── Farms quick-access card ─── */
