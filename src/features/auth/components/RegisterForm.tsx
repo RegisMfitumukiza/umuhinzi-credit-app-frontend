@@ -17,7 +17,7 @@ import {
 import type { RegisterPayload } from "../types";
 
 type RoleOption = {
-  value: RegisterPayload["role"];
+  value: RegisterSchemaType["role"];
   label: string;
   description: string;
   icon: LucideIcon;
