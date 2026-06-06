@@ -5,6 +5,7 @@ import type {
   Cooperative,
   CooperativeMember,
   CreateCooperativePayload,
+  MemberFarm,
   Pagination,
   UpdateCooperativePayload,
   UpdateMemberPayload,
@@ -12,6 +13,11 @@ import type {
 
 type MembersResponse = {
   members: CooperativeMember[];
+  pagination: Pagination;
+};
+
+type MemberFarmsResponse = {
+  data: MemberFarm[];
   pagination: Pagination;
 };
 
@@ -42,6 +48,31 @@ export const updateCooperative = async (
 ): Promise<ApiResponse<Cooperative>> => {
   const { data } = await api.patch<ApiResponse<Cooperative>>(
     `/cooperatives/${id}`,
+    payload
+  );
+  return data;
+};
+
+/* ── MEMBER FARMS ── */
+
+export const getMemberFarmsApi = async (params?: {
+  locationVerificationStatus?: string;
+  page?: number;
+  limit?: number;
+}): Promise<MemberFarmsResponse> => {
+  const { data } = await api.get<MemberFarmsResponse>(
+    "/cooperatives/mine/member-farms",
+    { params }
+  );
+  return data;
+};
+
+export const verifyFarmLocationApi = async (
+  farmId: string,
+  payload: { status: "VERIFIED" | "REJECTED"; note?: string }
+): Promise<ApiResponse<MemberFarm>> => {
+  const { data } = await api.patch<ApiResponse<MemberFarm>>(
+    `/farms/${farmId}/location-verification`,
     payload
   );
   return data;

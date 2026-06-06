@@ -14,6 +14,7 @@ import { useMyCooperative } from "../hooks/useMyCooperative";
 import { CreateCooperativeForm } from "../components/CreateCooperativeForm";
 import { EditCooperativeCard } from "../components/EditCooperativeCard";
 import { MembersSection } from "../components/MembersSection";
+import { FarmVerificationSection } from "../components/FarmVerificationSection";
 import type { Cooperative } from "../types";
 
 const CooperativeDashboard = () => {
@@ -143,6 +144,19 @@ const ActiveView = ({ cooperative }: { cooperative: Cooperative }) => (
         </Card>
       </div>
     </div>
+
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">Farm Location Verification</CardTitle>
+        <CardDescription>
+          Review GPS coordinates submitted by your members. Only verify after a physical field visit.
+        </CardDescription>
+      </CardHeader>
+      <Separator />
+      <CardContent className="pt-4">
+        <FarmVerificationSection />
+      </CardContent>
+    </Card>
   </div>
 );
 

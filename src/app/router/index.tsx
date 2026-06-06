@@ -13,6 +13,7 @@ import {
 import CooperativeDashboard from "@/features/cooperatives/pages/CooperativeDashboard";
 import FarmerDashboard from "@/features/farmers/pages/FarmerDashboard";
 import FarmsPage from "@/features/farms/pages/FarmsPage";
+import InstitutionDashboard from "@/features/institutions/pages/InstitutionDashboard";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
 import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
@@ -24,7 +25,6 @@ import { ROUTES } from "@/shared/constants/routes";
 /* ─── Placeholder dashboards (replace as features are built) ─── */
 const HomePage = () => <div>Home Page</div>;
 const AdminDashboard = () => <div>Admin Dashboard</div>;
-const InstitutionDashboard = () => <div>Institution Dashboard</div>;
 const GovernmentDashboard = () => <div>Government Dashboard</div>;
 
 export const AppRouter = () => {

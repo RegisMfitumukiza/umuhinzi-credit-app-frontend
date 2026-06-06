@@ -75,6 +75,32 @@ export type CreateCooperativePayload = {
 
 export type UpdateCooperativePayload = Partial<CreateCooperativePayload>;
 
+export type MemberFarm = {
+  id: string;
+  farmerId: string;
+  name: string;
+  description: string | null;
+  landSize: number;
+  landUnit: string;
+  district: string;
+  province: string | null;
+  sector: string | null;
+  cell: string | null;
+  village: string | null;
+  latitude: number;
+  longitude: number;
+  locationSource: string | null;
+  locationVerificationStatus: "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
+  locationVerifiedAt: string | null;
+  locationVerificationNote: string | null;
+  status: string;
+  createdAt: string;
+  farmer: {
+    id: string;
+    user: { fullName: string; email: string };
+  };
+};
+
 export type AddMemberPayload = {
   cooperativeId: string;
   farmerId: string;
