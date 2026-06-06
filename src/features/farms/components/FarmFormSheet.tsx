@@ -134,6 +134,10 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
         (payload as Record<string, unknown>)[key] =
           typeof val === "string" && val === "" ? undefined : val;
       });
+      // Backend rejects coordinates without a non-ADDRESS_ONLY locationSource
+      if (payload.latitude !== undefined || payload.longitude !== undefined) {
+        payload.locationSource = "GPS_BROWSER";
+      }
 
       updateMutate(
         { id: farm.id, payload },
@@ -152,6 +156,11 @@ export const FarmFormSheet = ({ farm, children }: Props) => {
         sector: data.sector || undefined,
         cell: data.cell || undefined,
         village: data.village || undefined,
+        // Backend rejects coordinates without a non-ADDRESS_ONLY locationSource
+        locationSource:
+          data.latitude !== undefined && data.longitude !== undefined
+            ? "GPS_BROWSER"
+            : undefined,
       };
       createMutate(payload, {
         onSuccess: () => {

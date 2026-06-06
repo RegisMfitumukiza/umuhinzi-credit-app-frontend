@@ -54,6 +54,15 @@ export type Farm = {
   _count: { crops: number };
 };
 
+export type LocationSource =
+  | "ADDRESS_ONLY"
+  | "GPS_BROWSER"
+  | "GPS_DEVICE"
+  | "MAP_PIN"
+  | "FIELD_OFFICER"
+  | "COOPERATIVE_MANAGER"
+  | "ADMIN";
+
 export type CreateFarmPayload = {
   name: string;
   landSize: number;
@@ -68,6 +77,7 @@ export type CreateFarmPayload = {
   village?: string;
   latitude?: number;
   longitude?: number;
+  locationSource?: LocationSource;
   locationAccuracyMeters?: number;
 };
 
