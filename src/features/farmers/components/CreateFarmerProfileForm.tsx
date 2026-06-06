@@ -107,7 +107,12 @@ export const CreateFarmerProfileForm = () => {
             min={0}
             max={80}
             placeholder="e.g. 5"
-            {...register("farmingExperienceYears")}
+            {...register("farmingExperienceYears", {
+              setValueAs: (v) =>
+                v === "" || v === null || v === undefined
+                  ? undefined
+                  : parseInt(v as string, 10),
+            })}
           />
           {errors.farmingExperienceYears && (
             <p className="text-sm text-destructive">

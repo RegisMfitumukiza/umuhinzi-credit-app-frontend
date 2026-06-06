@@ -12,10 +12,12 @@ export const createFarmerSchema = z.object({
 
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 
-  farmingExperienceYears: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().min(0, "Cannot be negative").max(80, "Too high").optional()
-  ),
+  farmingExperienceYears: z
+    .number()
+    .int()
+    .min(0, "Cannot be negative")
+    .max(80, "Too high")
+    .optional(),
 
   primaryCrop: z
     .string()
@@ -33,10 +35,12 @@ export const updateFarmerSchema = z.object({
 
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 
-  farmingExperienceYears: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    z.number().int().min(0, "Cannot be negative").max(80, "Too high").optional()
-  ),
+  farmingExperienceYears: z
+    .number()
+    .int()
+    .min(0, "Cannot be negative")
+    .max(80, "Too high")
+    .optional(),
 
   primaryCrop: z
     .string()

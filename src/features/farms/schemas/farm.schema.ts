@@ -23,22 +23,18 @@ export const createFarmSchema = z
 
     description: optionalStr(500),
 
-    landUnit: z.enum(["HECTARE", "ACRE", "SQUARE_METER"]).default("HECTARE"),
+    landUnit: z.enum(["HECTARE", "ACRE", "SQUARE_METER"]),
 
-    ownershipType: z
-      .enum([
-        "OWNED",
-        "RENTED",
-        "FAMILY_LAND",
-        "COOPERATIVE_LAND",
-        "GOVERNMENT_ALLOCATED",
-        "OTHER",
-      ])
-      .default("OWNED"),
+    ownershipType: z.enum([
+      "OWNED",
+      "RENTED",
+      "FAMILY_LAND",
+      "COOPERATIVE_LAND",
+      "GOVERNMENT_ALLOCATED",
+      "OTHER",
+    ]),
 
-    soilType: z
-      .enum(["CLAY", "SANDY", "SILT", "LOAM", "PEAT", "CHALKY", "UNKNOWN"])
-      .default("UNKNOWN"),
+    soilType: z.enum(["CLAY", "SANDY", "SILT", "LOAM", "PEAT", "CHALKY", "UNKNOWN"]),
 
     province: optionalStr(),
     sector: optionalStr(),
