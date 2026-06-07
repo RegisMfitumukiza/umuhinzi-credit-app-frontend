@@ -8,5 +8,5 @@ export const useCooperativeMembers = (params?: {
   useQuery({
     queryKey: ["cooperative", "members", params],
     queryFn: () => getCooperativeMembers(params),
-    select: (res) => res.data,
+    select: (res) => ({ members: res.data, pagination: res.pagination }),
   });

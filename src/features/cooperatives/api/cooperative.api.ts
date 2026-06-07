@@ -13,10 +13,8 @@ import type {
   UpdateMemberPayload,
 } from "../types";
 
-type MembersResponse = {
-  members: CooperativeMember[];
-  pagination: Pagination;
-};
+// Backend returns members as a flat array in `data`, with `pagination` at the top level
+type MembersListResponse = ApiResponse<CooperativeMember[]> & { pagination: Pagination };
 
 type MemberFarmsResponse = {
   data: MemberFarm[];
@@ -107,8 +105,8 @@ export const verifyFarmLocationApi = async (
 export const getCooperativeMembers = async (params?: {
   page?: number;
   limit?: number;
-}): Promise<ApiResponse<MembersResponse>> => {
-  const { data } = await api.get<ApiResponse<MembersResponse>>(
+}): Promise<MembersListResponse> => {
+  const { data } = await api.get<MembersListResponse>(
     "/cooperative-members",
     { params }
   );
