@@ -1,7 +1,7 @@
 import { Link, Outlet } from "react-router-dom";
 
 import { ROUTES } from "@/shared/constants/routes";
-import logoUrl from "@/assets/favicon/favicon.svg";
+import { AppLogo } from "@/shared/components/common/AppLogo";
 
 export const AuthLayout = () => {
   return (
@@ -9,12 +9,9 @@ export const AuthLayout = () => {
       <div className="mb-8 flex flex-col items-center gap-2">
         <Link
           to={ROUTES.HOME}
-          className="flex items-center gap-3 transition-opacity hover:opacity-80"
+          className="transition-opacity hover:opacity-80"
         >
-          <img src={logoUrl} alt="Umuhinzi Credit" className="h-11 w-11" />
-          <span className="text-2xl font-semibold tracking-tight text-foreground">
-            Umuhinzi Credit
-          </span>
+          <AppLogo iconSize="lg" textSize="lg" />
         </Link>
         <p className="text-sm text-muted-foreground">
           Agricultural credit platform for Rwanda

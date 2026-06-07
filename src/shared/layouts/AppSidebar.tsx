@@ -11,6 +11,8 @@ import {
   LogOut,
 } from "lucide-react";
 
+import { AppLogo } from "@/shared/components/common/AppLogo";
+
 import {
   Sidebar,
   SidebarContent,
@@ -91,11 +93,9 @@ export const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip="Umuhinzi Credit">
               <div className="flex items-center gap-2 cursor-default">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                  <Sprout className="h-4 w-4" />
-                </div>
+                <AppLogo iconSize="sm" showText={false} />
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Umuhinzi</span>
+                  <span className="truncate font-semibold">Umuhinzi Credit</span>
                   <span className="truncate text-xs opacity-60">Credit Platform</span>
                 </div>
               </div>
