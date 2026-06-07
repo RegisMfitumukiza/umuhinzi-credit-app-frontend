@@ -7,7 +7,9 @@ import type {
   CreateCooperativePayload,
   MemberFarm,
   Pagination,
+  PendingCooperative,
   UpdateCooperativePayload,
+  UpdateCooperativeStatusPayload,
   UpdateMemberPayload,
 } from "../types";
 
@@ -48,6 +50,28 @@ export const updateCooperative = async (
 ): Promise<ApiResponse<Cooperative>> => {
   const { data } = await api.patch<ApiResponse<Cooperative>>(
     `/cooperatives/${id}`,
+    payload
+  );
+  return data;
+};
+
+export const getPendingCooperatives = async (params?: {
+  page?: number;
+  limit?: number;
+}): Promise<ApiResponse<PendingCooperative[]> & { pagination: Pagination }> => {
+  const { data } = await api.get<ApiResponse<PendingCooperative[]> & { pagination: Pagination }>(
+    "/cooperatives/pending",
+    { params }
+  );
+  return data;
+};
+
+export const updateCooperativeStatus = async (
+  id: string,
+  payload: UpdateCooperativeStatusPayload
+): Promise<ApiResponse<Cooperative>> => {
+  const { data } = await api.patch<ApiResponse<Cooperative>>(
+    `/cooperatives/${id}/status`,
     payload
   );
   return data;

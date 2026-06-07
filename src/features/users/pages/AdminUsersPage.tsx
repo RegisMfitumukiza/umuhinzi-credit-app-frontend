@@ -26,6 +26,7 @@ import { UserActionMenu } from "../components/UserActionDialogs";
 import { UserRoleBadge } from "../components/UserRoleBadge";
 import { UserStatusBadge } from "../components/UserStatusBadge";
 import { SendNotificationDialog } from "@/features/notifications/components/SendNotificationDialog";
+import { PendingCooperativesCard } from "@/features/cooperatives/components/PendingCooperativesCard";
 import type { UserFilters, UserRole, UserStatus } from "../types";
 
 const ALL = "__all__";
@@ -94,6 +95,9 @@ const AdminUsersPage = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Pending cooperative approvals */}
+      <PendingCooperativesCard />
 
       {/* Filters */}
       <Card>

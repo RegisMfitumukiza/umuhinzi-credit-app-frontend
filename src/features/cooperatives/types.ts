@@ -75,6 +75,24 @@ export type CreateCooperativePayload = {
 
 export type UpdateCooperativePayload = Partial<CreateCooperativePayload>;
 
+export type UpdateCooperativeStatusPayload = {
+  status: CooperativeStatus;
+  rejectionReason?: string;
+};
+
+export type PendingCooperative = Cooperative & {
+  _count: { members: number; managers: number };
+  managers: Array<{
+    position: string | null;
+    user: {
+      id: string;
+      fullName: string;
+      email: string;
+      phone: string | null;
+    };
+  }>;
+};
+
 export type MemberFarm = {
   id: string;
   farmerId: string;
