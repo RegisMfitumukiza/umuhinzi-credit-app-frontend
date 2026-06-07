@@ -14,12 +14,21 @@ export type CropStatus =
   | "HARVESTED"
   | "FAILED";
 
+export type SeasonName = "Season A" | "Season B" | "Season C";
+
 export type Season = {
   id: string;
-  name: string;
+  name: SeasonName;
   year: number;
   startDate: string;
   endDate: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateSeasonPayload = {
+  name: SeasonName;
+  year: number;
 };
 
 export type Crop = {

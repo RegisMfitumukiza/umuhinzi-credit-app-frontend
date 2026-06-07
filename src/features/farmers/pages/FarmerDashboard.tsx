@@ -1,4 +1,4 @@
-import { Clock, ShieldOff, Tractor, Banknote } from "lucide-react";
+import { Clock, ShieldOff, Tractor, Banknote, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
@@ -13,6 +13,8 @@ import { ProfileCompletenessCard } from "../components/ProfileCompletenessCard";
 import { CooperativeSection } from "../components/CooperativeSection";
 import { FarmerStatusBadge, CredibilityBadge } from "../components/FarmerStatusBadge";
 import type { Farmer } from "../types";
+import { useLatestCreditScore } from "@/features/creditScore/hooks/useLatestCreditScore";
+import { RISK_LEVEL_LABELS } from "@/features/creditScore/types";
 
 const FarmerDashboard = () => {
   const { data: farmer, isLoading } = useMyFarmer();
@@ -44,6 +46,7 @@ const FarmerDashboard = () => {
       {farmer.status === "PENDING" && <PendingBanner />}
       {farmer.status === "SUSPENDED" && <SuspendedBanner />}
       <MainGrid farmer={farmer} />
+      <CreditScoreCard />
       <FarmsCard farmer={farmer} />
       <LoansCard />
       <CooperativeSection farmer={farmer} />
@@ -153,6 +156,37 @@ const FarmsCard = ({ farmer }: { farmer: Farmer }) => (
     </CardContent>
   </Card>
 );
+
+/* ─── Credit score quick-access card ─── */
+
+const CreditScoreCard = () => {
+  const { data: score } = useLatestCreditScore();
+
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+            <BarChart3 className="h-5 w-5 text-indigo-700" />
+          </div>
+          <div>
+            <p className="font-medium">Credit score</p>
+            <p className="text-sm text-muted-foreground">
+              {score
+                ? `${score.score}/100 — ${RISK_LEVEL_LABELS[score.riskLevel]}`
+                : "Generate your first credit score"}
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="shrink-0">
+          <Link to={ROUTES.FARMER_CREDIT_SCORE}>
+            {score ? "View score" : "Get started"}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 /* ─── Main grid ─── */
 

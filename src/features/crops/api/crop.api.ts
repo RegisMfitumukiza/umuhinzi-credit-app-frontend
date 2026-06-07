@@ -3,6 +3,7 @@ import type { ApiResponse } from "@/features/auth/types";
 import type {
   Crop,
   CreateCropPayload,
+  CreateSeasonPayload,
   Season,
   UpdateCropPayload,
 } from "../types";
@@ -30,6 +31,13 @@ type SeasonsListResponse = {
 export const getSeasons = async (): Promise<Season[]> => {
   const { data } = await api.get<SeasonsListResponse>("/seasons");
   return data.data;
+};
+
+export const createSeasonApi = async (
+  payload: CreateSeasonPayload
+): Promise<ApiResponse<Season>> => {
+  const { data } = await api.post<ApiResponse<Season>>("/seasons", payload);
+  return data;
 };
 
 /* ── Crops ── */

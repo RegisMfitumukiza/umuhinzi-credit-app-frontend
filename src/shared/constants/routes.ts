@@ -26,7 +26,11 @@ export const ROUTES = {
 
   FARMER_LOANS: "/farmer/loans",
 
+  FARMER_CREDIT_SCORE: "/farmer/credit-score",
+
   ADMIN_LOANS: "/admin/loans",
+
+  ADMIN_SEASONS: "/admin/seasons",
 
   INSTITUTION_LOANS: "/institution/loans",
 

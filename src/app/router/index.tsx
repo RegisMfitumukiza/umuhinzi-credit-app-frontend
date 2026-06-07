@@ -17,7 +17,9 @@ import FarmerLoansPage from "@/features/loans/pages/FarmerLoansPage";
 import AdminLoansPage from "@/features/loans/pages/AdminLoansPage";
 import InstitutionLoansPage from "@/features/loans/pages/InstitutionLoansPage";
 import InstitutionDashboard from "@/features/institutions/pages/InstitutionDashboard";
+import CreditScorePage from "@/features/creditScore/pages/CreditScorePage";
 import AdminUsersPage from "@/features/users/pages/AdminUsersPage";
+import AdminSeasonsPage from "@/features/crops/pages/AdminSeasonsPage";
 import UserProfilePage from "@/features/users/pages/UserProfilePage";
 import NotificationsPage from "@/features/notifications/pages/NotificationsPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
@@ -67,6 +69,7 @@ export const AppRouter = () => {
           <Route element={<RoleGuard allowedRoles={["ADMIN"]} />}>
             <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminUsersPage />} />
             <Route path={ROUTES.ADMIN_LOANS} element={<AdminLoansPage />} />
+            <Route path={ROUTES.ADMIN_SEASONS} element={<AdminSeasonsPage />} />
           </Route>
 
           {/* FARMER */}
@@ -74,6 +77,7 @@ export const AppRouter = () => {
             <Route path={ROUTES.FARMER_DASHBOARD} element={<FarmerDashboard />} />
             <Route path={ROUTES.FARMER_FARMS} element={<FarmsPage />} />
             <Route path={ROUTES.FARMER_LOANS} element={<FarmerLoansPage />} />
+            <Route path={ROUTES.FARMER_CREDIT_SCORE} element={<CreditScorePage />} />
           </Route>
 
           {/* INSTITUTION */}
