@@ -14,6 +14,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/components/ui/alert-dialog";
 
 import { useUpdateCooperative } from "../hooks/useUpdateCooperative";
 import {
@@ -37,6 +47,7 @@ type Props = { cooperative: Cooperative };
 
 export const EditCooperativeCard = ({ cooperative }: Props) => {
   const [editing, setEditing] = useState(false);
+  const [pendingData, setPendingData] = useState<UpdateCooperativeSchemaType | null>(null);
   const { mutate, isPending, error } = useUpdateCooperative();
 
   const {
@@ -65,14 +76,7 @@ export const EditCooperativeCard = ({ cooperative }: Props) => {
     (data.name !== cooperative.name ||
       data.registrationNumber !== cooperative.registrationNumber);
 
-  const onSubmit = (data: UpdateCooperativeSchemaType) => {
-    if (willReturnToPending(data)) {
-      const confirmed = window.confirm(
-        "Changing the name or registration number will return your cooperative to PENDING for re-review. Continue?"
-      );
-      if (!confirmed) return;
-    }
-
+  const submitData = (data: UpdateCooperativeSchemaType) => {
     const payload: UpdateCooperativePayload = {
       name: clean(data.name),
       registrationNumber: clean(data.registrationNumber),
@@ -86,7 +90,6 @@ export const EditCooperativeCard = ({ cooperative }: Props) => {
       cell: clean(data.cell),
       village: clean(data.village),
     };
-
     mutate(
       { id: cooperative.id, payload },
       {
@@ -98,7 +101,41 @@ export const EditCooperativeCard = ({ cooperative }: Props) => {
     );
   };
 
+  const onSubmit = (data: UpdateCooperativeSchemaType) => {
+    if (willReturnToPending(data)) {
+      setPendingData(data);
+    } else {
+      submitData(data);
+    }
+  };
+
   return (
+    <>
+    <AlertDialog
+      open={!!pendingData}
+      onOpenChange={(open) => !open && setPendingData(null)}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Return cooperative to pending review?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Changing the name or registration number will move your cooperative
+            back to <strong>Pending</strong> status and require admin re-approval.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Go back</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              if (pendingData) submitData(pendingData);
+              setPendingData(null);
+            }}
+          >
+            Continue
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex items-center gap-3">
@@ -216,5 +253,6 @@ export const EditCooperativeCard = ({ cooperative }: Props) => {
         )}
       </CardContent>
     </Card>
+    </>
   );
 };

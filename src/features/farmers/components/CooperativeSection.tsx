@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Clock, Loader2, MapPin, Search, Users, X } from "lucide-react";
+import { ConfirmDialog } from "@/shared/components/common/ConfirmDialog";
 import { toast } from "sonner";
 
 import {
@@ -68,9 +69,6 @@ const CurrentMembershipView = ({ membership }: MembershipViewProps) => {
   const { mutate: leave, isPending } = useLeaveCooperative();
 
   const handleLeave = () => {
-    const action =
-      membership.status === "PENDING" ? "Cancel this join request?" : "Leave this cooperative?";
-    if (!window.confirm(action)) return;
     leave(undefined, {
       onSuccess: () =>
         toast.success(
@@ -81,6 +79,8 @@ const CurrentMembershipView = ({ membership }: MembershipViewProps) => {
       onError: (err) => toast.error(err.message),
     });
   };
+
+  const isPending_ = membership.status === "PENDING";
 
   return (
     <div className="space-y-4">
@@ -94,7 +94,7 @@ const CurrentMembershipView = ({ membership }: MembershipViewProps) => {
             </p>
           )}
         </div>
-        {membership.status === "PENDING" ? (
+        {isPending_ ? (
           <Badge className="shrink-0 bg-yellow-100 text-yellow-800 border-yellow-200 border">
             <Clock className="mr-1 h-3 w-3" />
             Pending approval
@@ -106,7 +106,7 @@ const CurrentMembershipView = ({ membership }: MembershipViewProps) => {
         )}
       </div>
 
-      {membership.status === "PENDING" && (
+      {isPending_ && (
         <p className="text-sm text-muted-foreground">
           Your request is awaiting approval from the cooperative manager.
         </p>
@@ -118,16 +118,28 @@ const CurrentMembershipView = ({ membership }: MembershipViewProps) => {
         </p>
       )}
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="text-destructive border-destructive/30 hover:bg-destructive/10"
-        disabled={isPending}
-        onClick={handleLeave}
-      >
-        {isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
-        {membership.status === "PENDING" ? "Cancel request" : "Leave cooperative"}
-      </Button>
+      <ConfirmDialog
+        trigger={
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10"
+            disabled={isPending}
+          >
+            {isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+            {isPending_ ? "Cancel request" : "Leave cooperative"}
+          </Button>
+        }
+        title={isPending_ ? "Cancel join request?" : "Leave cooperative?"}
+        description={
+          isPending_
+            ? "Your pending join request will be cancelled."
+            : `You will be removed from ${membership.cooperative.name}.`
+        }
+        confirmText={isPending_ ? "Cancel request" : "Leave"}
+        variant="destructive"
+        onConfirm={handleLeave}
+      />
     </div>
   );
 };

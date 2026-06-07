@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,17 +12,13 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 
-import type { ReactNode } from "react";
-
 type ConfirmDialogProps = {
   trigger: ReactNode;
-
   title?: string;
   description?: string;
-
   confirmText?: string;
   cancelText?: string;
-
+  variant?: "default" | "destructive";
   onConfirm: () => void;
 };
 
@@ -30,32 +28,28 @@ export const ConfirmDialog = ({
   description = "This action cannot be undone.",
   confirmText = "Confirm",
   cancelText = "Cancel",
+  variant = "default",
   onConfirm,
 }: ConfirmDialogProps) => {
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        {trigger}
-      </AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {title}
-          </AlertDialogTitle>
-
-          <AlertDialogDescription>
-            {description}
-          </AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>
-            {cancelText}
-          </AlertDialogCancel>
-
+          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
+            className={
+              variant === "destructive"
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : undefined
+            }
           >
             {confirmText}
           </AlertDialogAction>
