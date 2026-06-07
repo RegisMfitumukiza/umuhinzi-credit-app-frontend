@@ -395,10 +395,29 @@ const CropFormView = ({ farmId, crop, onBack, onSuccess }: FormViewProps) => {
                 month: "short",
                 year: "numeric",
               });
+            const now = new Date();
+            const isPast = new Date(selected.endDate) < now;
+            const isFuture = new Date(selected.startDate) > now;
+            if (isPast) {
+              return (
+                <p className="flex items-center gap-1.5 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                  This season ended {fmt(selected.endDate)}. Your planting date must fall within {fmt(selected.startDate)} — {fmt(selected.endDate)}.
+                </p>
+              );
+            }
+            if (isFuture) {
+              return (
+                <p className="flex items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1.5 text-xs text-blue-700 dark:bg-blue-950/40 dark:text-blue-400">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                  This season starts {fmt(selected.startDate)}. Planting date must fall within {fmt(selected.startDate)} — {fmt(selected.endDate)}.
+                </p>
+              );
+            }
             return (
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-                {fmt(selected.startDate)} — {fmt(selected.endDate)}
+                Active season: {fmt(selected.startDate)} — {fmt(selected.endDate)}
               </p>
             );
           })()}
