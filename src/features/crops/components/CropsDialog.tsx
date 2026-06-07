@@ -286,6 +286,7 @@ const CropFormView = ({ farmId, crop, onBack, onSuccess }: FormViewProps) => {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<CreateCropSchemaType>({
     resolver: zodResolver(createCropSchema),
@@ -385,6 +386,22 @@ const CropFormView = ({ farmId, crop, onBack, onSuccess }: FormViewProps) => {
               </Select>
             )}
           />
+          {(() => {
+            const selected = seasons?.find((s) => s.id === watch("seasonId"));
+            if (!selected) return null;
+            const fmt = (d: string) =>
+              new Date(d).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              });
+            return (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                {fmt(selected.startDate)} — {fmt(selected.endDate)}
+              </p>
+            );
+          })()}
           {errors.seasonId && (
             <p className="text-sm text-destructive">{errors.seasonId.message}</p>
           )}
