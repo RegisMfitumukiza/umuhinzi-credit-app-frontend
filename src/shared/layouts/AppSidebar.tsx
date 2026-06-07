@@ -11,6 +11,10 @@ import {
   LogOut,
   CalendarDays,
   BarChart3,
+  PawPrint,
+  DollarSign,
+  ShoppingCart,
+  Lightbulb,
 } from "lucide-react";
 
 import { AppLogo } from "@/shared/components/common/AppLogo";
@@ -48,12 +52,17 @@ const roleNavItems: Record<UserRole, NavItem[]> = {
     { label: "Dashboard", icon: LayoutDashboard, to: ROUTES.FARMER_DASHBOARD },
     { label: "My Farms", icon: Sprout, to: ROUTES.FARMER_FARMS },
     { label: "My Loans", icon: CreditCard, to: ROUTES.FARMER_LOANS },
+    { label: "My Livestock", icon: PawPrint, to: ROUTES.FARMER_LIVESTOCK },
     { label: "Credit Score", icon: BarChart3, to: ROUTES.FARMER_CREDIT_SCORE },
+    { label: "Finances", icon: DollarSign, to: ROUTES.FARMER_FINANCE },
+    { label: "Recommendations", icon: Lightbulb, to: ROUTES.FARMER_RECOMMENDATIONS },
   ],
   ADMIN: [
     { label: "Users", icon: Users, to: ROUTES.ADMIN_DASHBOARD },
     { label: "Loans", icon: CreditCard, to: ROUTES.ADMIN_LOANS },
     { label: "Seasons", icon: CalendarDays, to: ROUTES.ADMIN_SEASONS },
+    { label: "Market Prices", icon: ShoppingCart, to: ROUTES.ADMIN_MARKET_PRICES },
+    { label: "Recommendations", icon: Lightbulb, to: ROUTES.ADMIN_RECOMMENDATIONS },
   ],
   INSTITUTION: [
     { label: "Dashboard", icon: Building2, to: ROUTES.INSTITUTION_DASHBOARD },

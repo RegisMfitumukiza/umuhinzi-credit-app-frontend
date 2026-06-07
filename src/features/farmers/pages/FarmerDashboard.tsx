@@ -1,4 +1,4 @@
-import { Clock, ShieldOff, Tractor, Banknote, BarChart3 } from "lucide-react";
+import { Clock, ShieldOff, Tractor, Banknote, BarChart3, PawPrint, DollarSign, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
@@ -15,6 +15,9 @@ import { FarmerStatusBadge, CredibilityBadge } from "../components/FarmerStatusB
 import type { Farmer } from "../types";
 import { useLatestCreditScore } from "@/features/creditScore/hooks/useLatestCreditScore";
 import { RISK_LEVEL_LABELS } from "@/features/creditScore/types";
+import { useFinancialDashboard } from "@/features/finance/hooks/useFinancialDashboard";
+import { CASH_FLOW_LABELS } from "@/features/finance/types";
+import { useRecommendations } from "@/features/recommendations/hooks/useRecommendations";
 
 const FarmerDashboard = () => {
   const { data: farmer, isLoading } = useMyFarmer();
@@ -46,7 +49,10 @@ const FarmerDashboard = () => {
       {farmer.status === "PENDING" && <PendingBanner />}
       {farmer.status === "SUSPENDED" && <SuspendedBanner />}
       <MainGrid farmer={farmer} />
+      <LivestockCard farmer={farmer} />
       <CreditScoreCard />
+      <FinanceCard />
+      <RecommendationsCard />
       <FarmsCard farmer={farmer} />
       <LoansCard />
       <CooperativeSection farmer={farmer} />
@@ -157,6 +163,33 @@ const FarmsCard = ({ farmer }: { farmer: Farmer }) => (
   </Card>
 );
 
+/* ─── Livestock quick-access card ─── */
+
+const LivestockCard = ({ farmer }: { farmer: Farmer }) => (
+  <Card>
+    <CardContent className="flex items-center justify-between gap-4 py-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+          <PawPrint className="h-5 w-5 text-amber-700" />
+        </div>
+        <div>
+          <p className="font-medium">My Livestock</p>
+          <p className="text-sm text-muted-foreground">
+            {farmer._count.livestock > 0
+              ? `${farmer._count.livestock} record${farmer._count.livestock !== 1 ? "s" : ""} — contributes to your credit score`
+              : "Add livestock records to strengthen your credit profile"}
+          </p>
+        </div>
+      </div>
+      <Button asChild variant="outline" className="shrink-0">
+        <Link to={ROUTES.FARMER_LIVESTOCK}>
+          {farmer._count.livestock > 0 ? "Manage" : "Add livestock"}
+        </Link>
+      </Button>
+    </CardContent>
+  </Card>
+);
+
 /* ─── Credit score quick-access card ─── */
 
 const CreditScoreCard = () => {
@@ -181,6 +214,71 @@ const CreditScoreCard = () => {
         <Button asChild variant="outline" className="shrink-0">
           <Link to={ROUTES.FARMER_CREDIT_SCORE}>
             {score ? "View score" : "Get started"}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ─── Finance quick-access card ─── */
+
+const FinanceCard = () => {
+  const { data: dashboard } = useFinancialDashboard();
+  const current = dashboard?.currentSeason;
+  const hasSummary = current?.financialSummary != null;
+
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
+            <DollarSign className="h-5 w-5 text-emerald-700" />
+          </div>
+          <div>
+            <p className="font-medium">Finances</p>
+            <p className="text-sm text-muted-foreground">
+              {hasSummary && current?.financialSummary
+                ? `${current.season.name} ${current.season.year} — ${CASH_FLOW_LABELS[current.financialSummary.cashFlowStatus]}`
+                : "Track expenses and seasonal profit"}
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="shrink-0">
+          <Link to={ROUTES.FARMER_FINANCE}>
+            {hasSummary ? "View finances" : "Get started"}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ─── Recommendations quick-access card ─── */
+
+const RecommendationsCard = () => {
+  const { data } = useRecommendations({ status: "ACTIVE", limit: 1 });
+  const activeCount = data?.pagination.total ?? 0;
+
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100">
+            <Lightbulb className="h-5 w-5 text-violet-700" />
+          </div>
+          <div>
+            <p className="font-medium">Recommendations</p>
+            <p className="text-sm text-muted-foreground">
+              {activeCount > 0
+                ? `${activeCount} active recommendation${activeCount !== 1 ? "s" : ""} waiting`
+                : "No new recommendations"}
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="shrink-0">
+          <Link to={ROUTES.FARMER_RECOMMENDATIONS}>
+            {activeCount > 0 ? "View all" : "Browse"}
           </Link>
         </Button>
       </CardContent>

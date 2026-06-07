@@ -45,6 +45,7 @@ export type CooperativeMember = {
       id: string;
       fullName: string;
       email: string;
+      phone: string | null;
     };
   };
 };

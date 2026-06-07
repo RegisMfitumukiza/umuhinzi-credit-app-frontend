@@ -1,4 +1,4 @@
-import { CheckCircle, Loader2, Trash2 } from "lucide-react";
+import { CheckCircle, Loader2, Phone, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/shared/components/ui/button";
@@ -19,9 +19,12 @@ import { useRemoveCooperativeMember } from "../hooks/useRemoveCooperativeMember"
 import { AddMemberDialog } from "./AddMemberDialog";
 import type { CooperativeMember } from "../types";
 
-type Props = { cooperativeId: string };
+type Props = {
+  cooperativeId: string;
+  hasPendingRequests?: boolean;
+};
 
-export const MembersSection = ({ cooperativeId }: Props) => {
+export const MembersSection = ({ cooperativeId, hasPendingRequests = false }: Props) => {
   const { data, isLoading } = useCooperativeMembers({ limit: 100 });
 
   const pending = data?.members.filter((m) => m.status === "PENDING") ?? [];
@@ -36,7 +39,7 @@ export const MembersSection = ({ cooperativeId }: Props) => {
   }
 
   return (
-    <Tabs defaultValue="active">
+    <Tabs defaultValue={hasPendingRequests ? "pending" : "active"}>
       <div className="flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="active">
@@ -50,7 +53,7 @@ export const MembersSection = ({ cooperativeId }: Props) => {
           <TabsTrigger value="pending">
             Requests
             {pending.length > 0 && (
-              <Badge className="ml-1.5 h-5 px-1.5 text-xs bg-yellow-500 text-white border-0">
+              <Badge className="ml-1.5 h-5 px-1.5 text-xs bg-amber-500 text-white border-0">
                 {pending.length}
               </Badge>
             )}
@@ -64,29 +67,36 @@ export const MembersSection = ({ cooperativeId }: Props) => {
         <MembersTable
           members={active}
           emptyMessage="No active members yet."
-          showApprove={false}
+          mode="active"
         />
       </TabsContent>
 
       <TabsContent value="pending" className="mt-4">
-        <MembersTable
-          members={pending}
-          emptyMessage="No pending join requests."
-          showApprove={true}
-        />
+        {pending.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            No pending join requests.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {pending.map((m) => (
+              <PendingRequestRow key={m.id} member={m} />
+            ))}
+          </div>
+        )}
       </TabsContent>
     </Tabs>
   );
 };
 
+/* ─── Active members table ─── */
+
 type TableProps = {
   members: CooperativeMember[];
   emptyMessage: string;
-  showApprove: boolean;
+  mode: "active" | "pending";
 };
 
-const MembersTable = ({ members, emptyMessage, showApprove }: TableProps) => {
-  const { mutate: updateMember, isPending: isUpdating } = useUpdateCooperativeMember();
+const MembersTable = ({ members, emptyMessage }: TableProps) => {
   const { mutate: removeMember, isPending: isRemoving } = useRemoveCooperativeMember();
 
   if (members.length === 0) {
@@ -95,17 +105,10 @@ const MembersTable = ({ members, emptyMessage, showApprove }: TableProps) => {
     );
   }
 
-  const approve = (id: string) => {
-    updateMember(
-      { id, payload: { status: "ACTIVE" } },
-      { onSuccess: () => toast.success("Member approved.") }
-    );
-  };
-
-  const decline = (id: string) => {
+  const remove = (id: string) => {
     removeMember(id, {
-      onSuccess: () =>
-        toast.success(showApprove ? "Request declined." : "Member removed."),
+      onSuccess: () => toast.success("Member removed."),
+      onError: (err) => toast.error(err.message),
     });
   };
 
@@ -114,8 +117,8 @@ const MembersTable = ({ members, emptyMessage, showApprove }: TableProps) => {
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-          {!showApprove && <TableHead>Joined</TableHead>}
+          <TableHead>Contact</TableHead>
+          <TableHead>Joined</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -123,40 +126,113 @@ const MembersTable = ({ members, emptyMessage, showApprove }: TableProps) => {
         {members.map((m) => (
           <TableRow key={m.id}>
             <TableCell className="font-medium">{m.farmer.user.fullName}</TableCell>
-            <TableCell className="text-muted-foreground">{m.farmer.user.email}</TableCell>
-            {!showApprove && (
-              <TableCell className="text-muted-foreground text-sm">
-                {m.joinedAt ? new Date(m.joinedAt).toLocaleDateString() : "—"}
-              </TableCell>
-            )}
-            <TableCell className="text-right">
-              <div className="flex justify-end gap-2">
-                {showApprove && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 text-green-700 border-green-200 hover:bg-green-50"
-                    disabled={isUpdating}
-                    onClick={() => approve(m.id)}
-                  >
-                    <CheckCircle className="h-3.5 w-3.5" />
-                    Approve
-                  </Button>
+            <TableCell>
+              <div className="text-sm text-muted-foreground">
+                <p>{m.farmer.user.email}</p>
+                {m.farmer.user.phone && (
+                  <p className="flex items-center gap-1 text-xs">
+                    <Phone className="h-3 w-3" />
+                    {m.farmer.user.phone}
+                  </p>
                 )}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  disabled={isRemoving}
-                  onClick={() => decline(m.id)}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
               </div>
+            </TableCell>
+            <TableCell className="text-sm text-muted-foreground">
+              {m.joinedAt ? new Date(m.joinedAt).toLocaleDateString("en-GB", {
+                day: "numeric", month: "short", year: "numeric",
+              }) : "—"}
+            </TableCell>
+            <TableCell className="text-right">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                disabled={isRemoving}
+                onClick={() => remove(m.id)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
             </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
+  );
+};
+
+/* ─── Pending request row ─── */
+
+const PendingRequestRow = ({ member }: { member: CooperativeMember }) => {
+  const { mutate: updateMember, isPending: isApproving } = useUpdateCooperativeMember();
+  const { mutate: removeMember, isPending: isDeclining } = useRemoveCooperativeMember();
+
+  const approve = () => {
+    updateMember(
+      { id: member.id, payload: { status: "ACTIVE" } },
+      {
+        onSuccess: () => toast.success(`${member.farmer.user.fullName} approved.`),
+        onError: (err) => toast.error(err.message),
+      }
+    );
+  };
+
+  const decline = () => {
+    removeMember(member.id, {
+      onSuccess: () => toast.success("Request declined."),
+      onError: (err) => toast.error(err.message),
+    });
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg border px-4 py-3">
+      <div className="min-w-0">
+        <p className="font-medium truncate">{member.farmer.user.fullName}</p>
+        <p className="text-sm text-muted-foreground truncate">{member.farmer.user.email}</p>
+        {member.farmer.user.phone && (
+          <p className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Phone className="h-3 w-3" />
+            {member.farmer.user.phone}
+          </p>
+        )}
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Requested{" "}
+          {member.createdAt
+            ? new Date(member.createdAt).toLocaleDateString("en-GB", {
+                day: "numeric", month: "short", year: "numeric",
+              })
+            : "—"}
+        </p>
+      </div>
+
+      <div className="flex shrink-0 gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 gap-1.5 border-green-200 text-green-700 hover:bg-green-50"
+          disabled={isApproving || isDeclining}
+          onClick={approve}
+        >
+          {isApproving ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <CheckCircle className="h-3.5 w-3.5" />
+          )}
+          Approve
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+          disabled={isApproving || isDeclining}
+          onClick={decline}
+        >
+          {isDeclining ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5" />
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };

@@ -28,9 +28,19 @@ export const ROUTES = {
 
   FARMER_CREDIT_SCORE: "/farmer/credit-score",
 
+  FARMER_LIVESTOCK: "/farmer/livestock",
+
+  FARMER_FINANCE: "/farmer/finance",
+
+  FARMER_RECOMMENDATIONS: "/farmer/recommendations",
+
   ADMIN_LOANS: "/admin/loans",
 
   ADMIN_SEASONS: "/admin/seasons",
+
+  ADMIN_MARKET_PRICES: "/admin/market-prices",
+
+  ADMIN_RECOMMENDATIONS: "/admin/recommendations",
 
   INSTITUTION_LOANS: "/institution/loans",
 

@@ -18,6 +18,11 @@ import AdminLoansPage from "@/features/loans/pages/AdminLoansPage";
 import InstitutionLoansPage from "@/features/loans/pages/InstitutionLoansPage";
 import InstitutionDashboard from "@/features/institutions/pages/InstitutionDashboard";
 import CreditScorePage from "@/features/creditScore/pages/CreditScorePage";
+import LivestockPage from "@/features/livestock/pages/LivestockPage";
+import FarmerFinancePage from "@/features/finance/pages/FarmerFinancePage";
+import AdminMarketPricesPage from "@/features/finance/pages/AdminMarketPricesPage";
+import FarmerRecommendationsPage from "@/features/recommendations/pages/FarmerRecommendationsPage";
+import AdminRecommendationsPage from "@/features/recommendations/pages/AdminRecommendationsPage";
 import AdminUsersPage from "@/features/users/pages/AdminUsersPage";
 import AdminSeasonsPage from "@/features/crops/pages/AdminSeasonsPage";
 import UserProfilePage from "@/features/users/pages/UserProfilePage";
@@ -70,6 +75,8 @@ export const AppRouter = () => {
             <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminUsersPage />} />
             <Route path={ROUTES.ADMIN_LOANS} element={<AdminLoansPage />} />
             <Route path={ROUTES.ADMIN_SEASONS} element={<AdminSeasonsPage />} />
+            <Route path={ROUTES.ADMIN_MARKET_PRICES} element={<AdminMarketPricesPage />} />
+            <Route path={ROUTES.ADMIN_RECOMMENDATIONS} element={<AdminRecommendationsPage />} />
           </Route>
 
           {/* FARMER */}
@@ -78,6 +85,9 @@ export const AppRouter = () => {
             <Route path={ROUTES.FARMER_FARMS} element={<FarmsPage />} />
             <Route path={ROUTES.FARMER_LOANS} element={<FarmerLoansPage />} />
             <Route path={ROUTES.FARMER_CREDIT_SCORE} element={<CreditScorePage />} />
+            <Route path={ROUTES.FARMER_LIVESTOCK} element={<LivestockPage />} />
+            <Route path={ROUTES.FARMER_FINANCE} element={<FarmerFinancePage />} />
+            <Route path={ROUTES.FARMER_RECOMMENDATIONS} element={<FarmerRecommendationsPage />} />
           </Route>
 
           {/* INSTITUTION */}
