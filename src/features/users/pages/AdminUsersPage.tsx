@@ -27,6 +27,7 @@ import { UserRoleBadge } from "../components/UserRoleBadge";
 import { UserStatusBadge } from "../components/UserStatusBadge";
 import { SendNotificationDialog } from "@/features/notifications/components/SendNotificationDialog";
 import { PendingCooperativesCard } from "@/features/cooperatives/components/PendingCooperativesCard";
+import { usePendingCooperatives } from "@/features/cooperatives/hooks/usePendingCooperatives";
 import type { UserFilters, UserRole, UserStatus } from "../types";
 
 const ALL = "__all__";
@@ -46,12 +47,14 @@ const AdminUsersPage = () => {
   };
 
   const { data: statsData, isLoading: statsLoading } = useUserStats();
+  const { data: pendingCoopsData } = usePendingCooperatives({ limit: 1 });
+  const pendingCoopsCount = pendingCoopsData?.pagination?.total ?? 0;
   const { data, isLoading, isFetching } = useAllUsers(filters);
 
   const users = data?.data ?? [];
   const pagination = data?.pagination;
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPage(1);
   };
@@ -70,11 +73,12 @@ const AdminUsersPage = () => {
 
       {/* Stats */}
       {!statsLoading && statsData && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard label="Total users" value={statsData.totalUsers} />
-          <StatCard label="Active" value={statsData.byStatus.active} color="green" />
-          <StatCard label="Pending" value={statsData.byStatus.pending} color="yellow" />
+          <StatCard label="Active accounts" value={statsData.byStatus.active} color="green" />
+          <StatCard label="Pending accounts" value={statsData.byStatus.pending} color="yellow" />
           <StatCard label="Suspended / Deactivated" value={statsData.byStatus.suspended + statsData.byStatus.deactivated} color="red" />
+          <StatCard label="Pending approvals" value={pendingCoopsCount} color={pendingCoopsCount > 0 ? "yellow" : undefined} />
         </div>
       )}
 
