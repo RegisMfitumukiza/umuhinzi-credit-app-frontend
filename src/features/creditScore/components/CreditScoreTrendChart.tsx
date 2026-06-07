@@ -91,7 +91,7 @@ export const CreditScoreTrendChart = ({ trend }: Props) => {
                 borderRadius: 8,
                 border: "1px solid #e5e7eb",
               }}
-              formatter={(value: number) => [value, "Score"]}
+              formatter={(value) => [`${value}`, "Score"]}
             />
             {/* Risk threshold lines */}
             <ReferenceLine y={70} stroke="#22c55e" strokeDasharray="4 4" strokeWidth={1} />

@@ -48,10 +48,10 @@ const SEASON_INFO: Record<SeasonName, string> = {
 
 const schema = z.object({
   name: z.enum(["Season A", "Season B", "Season C"] as const, {
-    required_error: "Select a season name",
+    error: "Select a season name",
   }),
   year: z
-    .number({ invalid_type_error: "Enter a valid year" })
+    .number({ error: "Enter a valid year" })
     .int()
     .min(2020, "Year must be 2020 or later")
     .max(2035, "Year must be 2035 or earlier"),
