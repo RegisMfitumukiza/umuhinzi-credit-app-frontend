@@ -13,7 +13,7 @@ import { AppLoader } from "@/shared/components/common/AppLoader";
 import { ROUTES } from "@/shared/constants/routes";
 
 import { useAuth } from "../context/AuthProvider";
-import { getDefaultRoute } from "../utils/get-default-route";
+import { getDefaultRoute, isRouteAllowedForRole } from "../utils/get-default-route";
 import { LoginForm } from "../components/LoginForm";
 
 const LoginPage = () => {
@@ -36,7 +36,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      navigate(from ?? getDefaultRoute(user.role), { replace: true });
+      const destination =
+        from && isRouteAllowedForRole(from, user.role)
+          ? from
+          : getDefaultRoute(user.role);
+      navigate(destination, { replace: true });
     }
   }, [isAuthenticated, user, from, navigate]);
 
