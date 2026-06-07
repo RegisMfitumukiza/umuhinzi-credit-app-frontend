@@ -1,11 +1,27 @@
 import { Outlet } from "react-router-dom";
 
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/shared/components/ui/sidebar";
+import { Separator } from "@/shared/components/ui/separator";
+
+import { AppSidebar } from "./AppSidebar";
+
 export const DashboardLayout = () => {
   return (
-    <div className="min-h-screen">
-      <main className="container mx-auto px-4 py-6">
-        <Outlet />
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="h-4" />
+        </header>
+        <main className="flex flex-1 flex-col overflow-auto p-6">
+          <Outlet />
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };

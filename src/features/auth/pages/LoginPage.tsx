@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
+import { AppLoader } from "@/shared/components/common/AppLoader";
 import { ROUTES } from "@/shared/constants/routes";
 
 import { useAuth } from "../context/AuthProvider";
@@ -16,7 +17,7 @@ import { getDefaultRoute } from "../utils/get-default-route";
 import { LoginForm } from "../components/LoginForm";
 
 const LoginPage = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,6 +39,10 @@ const LoginPage = () => {
       navigate(from ?? getDefaultRoute(user.role), { replace: true });
     }
   }, [isAuthenticated, user, from, navigate]);
+
+  if (isLoading) {
+    return <AppLoader />;
+  }
 
   return (
     <Card>
