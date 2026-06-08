@@ -142,3 +142,33 @@ export const removeCooperativeMember = async (
   );
   return data;
 };
+
+export type RegisterFarmerPayload = {
+  fullName: string;
+  email: string;
+  phone?: string;
+  nationalId: string;
+  district?: string;
+  province?: string;
+  dateOfBirth?: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
+  primaryCrop?: string;
+  farmingExperienceYears?: number;
+};
+
+export type RegisterFarmerResult = {
+  farmer: { id: string };
+  user: { id: string; fullName: string; email: string; phone: string | null };
+  tempPassword: string;
+  cooperativeId: string;
+};
+
+export const registerFarmerForCooperative = async (
+  payload: RegisterFarmerPayload
+): Promise<ApiResponse<RegisterFarmerResult>> => {
+  const { data } = await api.post<ApiResponse<RegisterFarmerResult>>(
+    "/cooperative-members/register-farmer",
+    payload
+  );
+  return data;
+};
