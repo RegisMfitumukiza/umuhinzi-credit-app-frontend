@@ -44,7 +44,6 @@ export const LivestockCard = ({ livestock }: Props) => {
   };
 
   const typeLabel = LIVESTOCK_TYPE_LABELS[livestock.type];
-  const purposeLabel = LIVESTOCK_PURPOSE_LABELS[livestock.purpose];
   const colorClass = LIVESTOCK_TYPE_COLORS[livestock.type];
 
   return (
@@ -60,7 +59,13 @@ export const LivestockCard = ({ livestock }: Props) => {
             </div>
             <div>
               <p className="font-semibold leading-tight">{typeLabel}</p>
-              <p className="text-xs text-muted-foreground">{purposeLabel}</p>
+              {livestock.purposes.length > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {livestock.purposes.map((p) => LIVESTOCK_PURPOSE_LABELS[p]).join(" · ")}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">No purpose set</p>
+              )}
             </div>
           </div>
           <LivestockStatusBadge status={livestock.status} />

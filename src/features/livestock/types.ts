@@ -25,7 +25,7 @@ export type Livestock = {
   id: string;
   farmerId: string;
   type: LivestockType;
-  purpose: LivestockPurpose;
+  purposes: LivestockPurpose[];
   quantity: number;
   estimatedValue: number | null;
   notes: string | null;
@@ -36,7 +36,7 @@ export type Livestock = {
 
 export type CreateLivestockPayload = {
   type: LivestockType;
-  purpose?: LivestockPurpose;
+  purposes?: LivestockPurpose[];
   quantity?: number;
   estimatedValue?: number;
   notes?: string;
@@ -44,7 +44,7 @@ export type CreateLivestockPayload = {
 
 export type UpdateLivestockPayload = {
   type?: LivestockType;
-  purpose?: LivestockPurpose;
+  purposes?: LivestockPurpose[];
   quantity?: number;
   estimatedValue?: number;
   notes?: string;

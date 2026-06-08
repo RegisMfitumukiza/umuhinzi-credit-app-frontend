@@ -7,7 +7,7 @@ const STATUSES = ["ACTIVE", "SOLD", "DECEASED", "INACTIVE"] as const;
 export const createLivestockSchema = z.object({
   type: z.enum(TYPES, { message: "Select a livestock type" }),
 
-  purpose: z.enum(PURPOSES).optional(),
+  purposes: z.array(z.enum(PURPOSES)).optional(),
 
   quantity: z
     .number({ message: "Enter a valid number" })

@@ -17,6 +17,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Separator } from "@/shared/components/ui/separator";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -33,7 +34,12 @@ import {
   type CreateLivestockSchemaType,
   type UpdateLivestockSchemaType,
 } from "../schemas/livestock.schema";
-import type { Livestock, UpdateLivestockPayload } from "../types";
+import type { Livestock, LivestockPurpose, UpdateLivestockPayload } from "../types";
+import { LIVESTOCK_PURPOSE_LABELS } from "../types";
+
+const ALL_PURPOSES = [
+  "MILK", "MEAT", "EGGS", "BREEDING", "FARM_WORK", "COMMERCIAL", "OTHER",
+] as const satisfies LivestockPurpose[];
 
 type Props = {
   livestock?: Livestock;
@@ -44,10 +50,8 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
   const [open, setOpen] = useState(false);
   const isEdit = !!livestock;
 
-  const { mutate: createMutate, isPending: isCreating, error: createError } =
-    useCreateLivestock();
-  const { mutate: updateMutate, isPending: isUpdating, error: updateError } =
-    useUpdateLivestock();
+  const { mutate: createMutate, isPending: isCreating, error: createError } = useCreateLivestock();
+  const { mutate: updateMutate, isPending: isUpdating, error: updateError } = useUpdateLivestock();
 
   const isPending = isCreating || isUpdating;
   const apiError = createError ?? updateError;
@@ -65,14 +69,14 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
     defaultValues: livestock
       ? {
           type: livestock.type,
-          purpose: livestock.purpose,
+          purposes: livestock.purposes,
           quantity: livestock.quantity,
           estimatedValue: livestock.estimatedValue ?? undefined,
           notes: livestock.notes ?? "",
           status: livestock.status,
         }
       : {
-          purpose: "COMMERCIAL",
+          purposes: [],
           quantity: 1,
         },
   });
@@ -87,7 +91,6 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
         (payload as Record<string, unknown>)[key as string] =
           typeof val === "string" && val === "" ? undefined : val;
       });
-
       updateMutate(
         { id: livestock.id, payload },
         {
@@ -100,10 +103,7 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
     } else {
       const payload = {
         ...(data as CreateLivestockSchemaType),
-        notes:
-          typeof data.notes === "string" && data.notes === ""
-            ? undefined
-            : data.notes,
+        notes: typeof data.notes === "string" && data.notes === "" ? undefined : data.notes,
       };
       createMutate(payload, {
         onSuccess: () => {
@@ -121,9 +121,7 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
 
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>
-            {isEdit ? "Edit livestock record" : "Add livestock"}
-          </SheetTitle>
+          <SheetTitle>{isEdit ? "Edit livestock record" : "Add livestock"}</SheetTitle>
           <SheetDescription>
             {isEdit
               ? "Only changed fields will be saved."
@@ -131,72 +129,81 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-6 pb-8">
-          {/* ── Type & Purpose ── */}
+        <form onSubmit={handleSubmit(onSubmit as Parameters<typeof handleSubmit>[0])} className="mt-4 space-y-6 pb-8">
+          {/* ── Type ── */}
           <section className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Animal details
             </p>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>
-                  Type <span className="text-destructive">*</span>
-                </Label>
-                <Controller
-                  name="type"
-                  control={control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="CATTLE">Cattle</SelectItem>
-                        <SelectItem value="GOAT">Goat</SelectItem>
-                        <SelectItem value="SHEEP">Sheep</SelectItem>
-                        <SelectItem value="PIG">Pig</SelectItem>
-                        <SelectItem value="CHICKEN">Chicken</SelectItem>
-                        <SelectItem value="DUCK">Duck</SelectItem>
-                        <SelectItem value="RABBIT">Rabbit</SelectItem>
-                        <SelectItem value="FISH">Fish</SelectItem>
-                        <SelectItem value="BEE">Bees</SelectItem>
-                        <SelectItem value="OTHER">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.type && (
-                  <p className="text-sm text-destructive">{errors.type.message}</p>
+            <div className="space-y-1.5">
+              <Label>
+                Type <span className="text-destructive">*</span>
+              </Label>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CATTLE">Cattle</SelectItem>
+                      <SelectItem value="GOAT">Goat</SelectItem>
+                      <SelectItem value="SHEEP">Sheep</SelectItem>
+                      <SelectItem value="PIG">Pig</SelectItem>
+                      <SelectItem value="CHICKEN">Chicken</SelectItem>
+                      <SelectItem value="DUCK">Duck</SelectItem>
+                      <SelectItem value="RABBIT">Rabbit</SelectItem>
+                      <SelectItem value="FISH">Fish</SelectItem>
+                      <SelectItem value="BEE">Bees</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
-              </div>
+              />
+              {errors.type && (
+                <p className="text-sm text-destructive">{errors.type.message}</p>
+              )}
+            </div>
 
-              <div className="space-y-1.5">
-                <Label>Purpose</Label>
-                <Controller
-                  name="purpose"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? "COMMERCIAL"}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="MILK">Milk</SelectItem>
-                        <SelectItem value="MEAT">Meat</SelectItem>
-                        <SelectItem value="EGGS">Eggs</SelectItem>
-                        <SelectItem value="BREEDING">Breeding</SelectItem>
-                        <SelectItem value="FARM_WORK">Farm work</SelectItem>
-                        <SelectItem value="COMMERCIAL">Commercial</SelectItem>
-                        <SelectItem value="OTHER">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
+            {/* ── Purposes (multi-select checkboxes) ── */}
+            <div className="space-y-2">
+              <Label>Purpose</Label>
+              <Controller
+                name="purposes"
+                control={control}
+                render={({ field }) => {
+                  const selected: LivestockPurpose[] = field.value ?? [];
+                  const toggle = (p: LivestockPurpose) => {
+                    field.onChange(
+                      selected.includes(p)
+                        ? selected.filter((v) => v !== p)
+                        : [...selected, p]
+                    );
+                  };
+                  return (
+                    <div className="grid grid-cols-2 gap-2">
+                      {ALL_PURPOSES.map((p) => (
+                        <label
+                          key={p}
+                          className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent transition-colors"
+                        >
+                          <Checkbox
+                            checked={selected.includes(p)}
+                            onCheckedChange={() => toggle(p)}
+                          />
+                          {LIVESTOCK_PURPOSE_LABELS[p]}
+                        </label>
+                      ))}
+                    </div>
+                  );
+                }}
+              />
+              {errors.purposes && (
+                <p className="text-sm text-destructive">{errors.purposes.message}</p>
+              )}
             </div>
           </section>
 
@@ -218,14 +225,11 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
                   step="1"
                   placeholder="e.g. 5"
                   {...register("quantity", {
-                    setValueAs: (v) =>
-                      v === "" ? undefined : parseInt(v as string, 10),
+                    setValueAs: (v) => (v === "" ? undefined : parseInt(v as string, 10)),
                   })}
                 />
                 {errors.quantity && (
-                  <p className="text-sm text-destructive">
-                    {errors.quantity.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.quantity.message}</p>
                 )}
               </div>
 
@@ -238,14 +242,11 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
                   step="1000"
                   placeholder="e.g. 500000"
                   {...register("estimatedValue", {
-                    setValueAs: (v) =>
-                      v === "" ? undefined : parseFloat(v as string),
+                    setValueAs: (v) => (v === "" ? undefined : parseFloat(v as string)),
                   })}
                 />
                 {errors.estimatedValue && (
-                  <p className="text-sm text-destructive">
-                    {errors.estimatedValue.message}
-                  </p>
+                  <p className="text-sm text-destructive">{errors.estimatedValue.message}</p>
                 )}
               </div>
             </div>
@@ -303,12 +304,7 @@ export const LivestockFormSheet = ({ livestock, children }: Props) => {
           )}
 
           <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={() => setOpen(false)}
-            >
+            <Button type="button" variant="outline" className="flex-1" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isPending} className="flex-1">
