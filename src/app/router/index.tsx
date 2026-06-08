@@ -23,6 +23,9 @@ import FarmerFinancePage from "@/features/finance/pages/FarmerFinancePage";
 import AdminMarketPricesPage from "@/features/finance/pages/AdminMarketPricesPage";
 import FarmerRecommendationsPage from "@/features/recommendations/pages/FarmerRecommendationsPage";
 import AdminRecommendationsPage from "@/features/recommendations/pages/AdminRecommendationsPage";
+import InputCostsPage from "@/features/inputCosts/pages/InputCostsPage";
+import FarmerProductivityPage from "@/features/productivity/pages/FarmerProductivityPage";
+import AdminYieldsPage from "@/features/productivity/pages/AdminYieldsPage";
 import AdminUsersPage from "@/features/users/pages/AdminUsersPage";
 import AdminSeasonsPage from "@/features/crops/pages/AdminSeasonsPage";
 import UserProfilePage from "@/features/users/pages/UserProfilePage";
@@ -88,6 +91,8 @@ export const AppRouter = () => {
             <Route path={ROUTES.FARMER_LIVESTOCK} element={<LivestockPage />} />
             <Route path={ROUTES.FARMER_FINANCE} element={<FarmerFinancePage />} />
             <Route path={ROUTES.FARMER_RECOMMENDATIONS} element={<FarmerRecommendationsPage />} />
+            <Route path={ROUTES.FARMER_INPUT_COSTS} element={<InputCostsPage />} />
+            <Route path={ROUTES.FARMER_PRODUCTIVITY} element={<FarmerProductivityPage />} />
           </Route>
 
           {/* INSTITUTION */}
@@ -100,6 +105,7 @@ export const AppRouter = () => {
               path={ROUTES.INSTITUTION_LOANS}
               element={<InstitutionLoansPage />}
             />
+            <Route path={ROUTES.YIELD_VERIFICATION} element={<AdminYieldsPage />} />
           </Route>
 
           {/* COOPERATIVE */}
@@ -108,6 +114,7 @@ export const AppRouter = () => {
               path={ROUTES.COOPERATIVE_DASHBOARD}
               element={<CooperativeDashboard />}
             />
+            <Route path={ROUTES.YIELD_VERIFICATION} element={<AdminYieldsPage />} />
           </Route>
 
           {/* GOVERNMENT */}

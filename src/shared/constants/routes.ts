@@ -34,7 +34,13 @@ export const ROUTES = {
 
   FARMER_RECOMMENDATIONS: "/farmer/recommendations",
 
+  FARMER_INPUT_COSTS: "/farmer/input-costs",
+
+  FARMER_PRODUCTIVITY: "/farmer/productivity",
+
   ADMIN_LOANS: "/admin/loans",
+
+  YIELD_VERIFICATION: "/yields/verify",
 
   ADMIN_SEASONS: "/admin/seasons",
 

@@ -1,4 +1,4 @@
-import { Clock, ShieldOff, Tractor, Banknote, BarChart3, PawPrint, DollarSign, Lightbulb } from "lucide-react";
+import { Clock, ShieldOff, Tractor, Banknote, BarChart3, PawPrint, DollarSign, Lightbulb, Coins, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
@@ -18,6 +18,8 @@ import { RISK_LEVEL_LABELS } from "@/features/creditScore/types";
 import { useFinancialDashboard } from "@/features/finance/hooks/useFinancialDashboard";
 import { CASH_FLOW_LABELS } from "@/features/finance/types";
 import { useRecommendations } from "@/features/recommendations/hooks/useRecommendations";
+import { useMyInputCosts } from "@/features/inputCosts/hooks/useMyInputCosts";
+import { useProductivityDashboard } from "@/features/productivity/hooks/useProductivityDashboard";
 
 const FarmerDashboard = () => {
   const { data: farmer, isLoading } = useMyFarmer();
@@ -52,6 +54,8 @@ const FarmerDashboard = () => {
       <LivestockCard farmer={farmer} />
       <CreditScoreCard />
       <FinanceCard />
+      <InputCostsCard />
+      <ProductivityCard />
       <RecommendationsCard />
       <FarmsCard farmer={farmer} />
       <LoansCard />
@@ -247,6 +251,70 @@ const FinanceCard = () => {
         <Button asChild variant="outline" className="shrink-0">
           <Link to={ROUTES.FARMER_FINANCE}>
             {hasSummary ? "View finances" : "Get started"}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ─── Input costs quick-access card ─── */
+
+const InputCostsCard = () => {
+  const { data } = useMyInputCosts({ limit: 1 });
+  const total = data?.pagination.total ?? 0;
+
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+            <Coins className="h-5 w-5 text-orange-700" />
+          </div>
+          <div>
+            <p className="font-medium">Input costs</p>
+            <p className="text-sm text-muted-foreground">
+              {total > 0
+                ? `${total} input cost record${total !== 1 ? "s" : ""} across your crops`
+                : "No input costs recorded yet"}
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="shrink-0">
+          <Link to={ROUTES.FARMER_INPUT_COSTS}>
+            {total > 0 ? "Manage" : "Get started"}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ─── Productivity quick-access card ─── */
+
+const ProductivityCard = () => {
+  const { data: dashboard } = useProductivityDashboard();
+  const rate = dashboard?.summary.averageProductivityRate;
+
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100">
+            <Activity className="h-5 w-5 text-teal-700" />
+          </div>
+          <div>
+            <p className="font-medium">Productivity</p>
+            <p className="text-sm text-muted-foreground">
+              {rate != null
+                ? `Avg productivity rate: ${rate.toLocaleString("en-RW", { maximumFractionDigits: 1 })}%`
+                : "Record harvest yields to track productivity"}
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="shrink-0">
+          <Link to={ROUTES.FARMER_PRODUCTIVITY}>
+            {rate != null ? "View" : "Get started"}
           </Link>
         </Button>
       </CardContent>

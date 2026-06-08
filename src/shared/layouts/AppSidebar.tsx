@@ -15,6 +15,9 @@ import {
   DollarSign,
   ShoppingCart,
   Lightbulb,
+  Coins,
+  Activity,
+  ShieldCheck,
 } from "lucide-react";
 
 import { AppLogo } from "@/shared/components/common/AppLogo";
@@ -55,6 +58,8 @@ const roleNavItems: Record<UserRole, NavItem[]> = {
     { label: "My Livestock", icon: PawPrint, to: ROUTES.FARMER_LIVESTOCK },
     { label: "Credit Score", icon: BarChart3, to: ROUTES.FARMER_CREDIT_SCORE },
     { label: "Finances", icon: DollarSign, to: ROUTES.FARMER_FINANCE },
+    { label: "Input Costs", icon: Coins, to: ROUTES.FARMER_INPUT_COSTS },
+    { label: "Productivity", icon: Activity, to: ROUTES.FARMER_PRODUCTIVITY },
     { label: "Recommendations", icon: Lightbulb, to: ROUTES.FARMER_RECOMMENDATIONS },
   ],
   ADMIN: [
@@ -67,9 +72,11 @@ const roleNavItems: Record<UserRole, NavItem[]> = {
   INSTITUTION: [
     { label: "Dashboard", icon: Building2, to: ROUTES.INSTITUTION_DASHBOARD },
     { label: "Loans", icon: CreditCard, to: ROUTES.INSTITUTION_LOANS },
+    { label: "Yield Verification", icon: ShieldCheck, to: ROUTES.YIELD_VERIFICATION },
   ],
   COOPERATIVE_MANAGER: [
     { label: "Dashboard", icon: Users, to: ROUTES.COOPERATIVE_DASHBOARD },
+    { label: "Yield Verification", icon: ShieldCheck, to: ROUTES.YIELD_VERIFICATION },
   ],
   GOVERNMENT_PARTNER: [
     { label: "Dashboard", icon: Landmark, to: ROUTES.GOVERNMENT_DASHBOARD },
