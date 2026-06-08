@@ -50,7 +50,7 @@ export const RecommendationFormSheet = ({ recommendation, farmerId, children }: 
     formState: { errors, dirtyFields },
   } = useForm<UpdateRecommendationSchemaType>({
     resolver: zodResolver(isEdit ? updateRecommendationSchema : createRecommendationSchema),
-    defaultValues: recommendation
+    defaultValues: (recommendation
       ? {
           type: recommendation.type,
           priority: recommendation.priority,
@@ -60,9 +60,9 @@ export const RecommendationFormSheet = ({ recommendation, farmerId, children }: 
           actionUrl: recommendation.actionUrl ?? "",
         }
       : {
-          priority: "MEDIUM",
+          priority: "MEDIUM" as const,
           farmerId: farmerId ?? "",
-        },
+        }) as unknown as UpdateRecommendationSchemaType,
   });
 
   const onSubmit = (data: CreateRecommendationSchemaType | UpdateRecommendationSchemaType) => {

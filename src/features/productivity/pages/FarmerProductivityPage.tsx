@@ -173,7 +173,7 @@ const DashboardTab = () => {
                 <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} />
                 <Tooltip
                   contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
-                  formatter={(value: number) => [`${fmt(value)}%`, "Productivity rate"]}
+                  formatter={(value: unknown) => [`${fmt(Number(value))}%`, "Productivity rate"]}
                 />
                 <ReferenceLine y={100} stroke="#22c55e" strokeDasharray="4 2" label={{ value: "100%", fontSize: 10, fill: "#16a34a" }} />
                 <Bar dataKey="productivityRate" name="Rate %" fill="#6366f1" radius={[3, 3, 0, 0]} />

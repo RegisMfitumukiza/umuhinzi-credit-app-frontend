@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
 import { Badge } from "@/shared/components/ui/badge";

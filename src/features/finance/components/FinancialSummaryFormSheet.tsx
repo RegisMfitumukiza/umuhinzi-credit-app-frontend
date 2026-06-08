@@ -110,7 +110,7 @@ export const FinancialSummaryFormSheet = ({ summary, children }: Props) => {
                   </Select>
                 )}
               />
-              {"seasonId" in errors && errors["seasonId" as keyof typeof errors] && (
+              {"seasonId" in errors && !!(errors["seasonId" as keyof typeof errors]) && (
                 <p className="text-sm text-destructive">
                   {(errors["seasonId" as keyof typeof errors] as { message?: string })?.message}
                 </p>

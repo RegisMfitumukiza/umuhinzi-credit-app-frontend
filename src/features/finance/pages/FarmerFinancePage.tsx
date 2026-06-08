@@ -176,7 +176,7 @@ const OverviewTab = ({ dashboard }: { dashboard: DashboardData }) => {
                   tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
-                  formatter={(value: number) => [`${fmt(value)} RWF`, ""]}
+                  formatter={(value: unknown) => [`${fmt(Number(value))} RWF`, ""]}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar dataKey="totalIncome" name="Income" fill="#22c55e" radius={[3, 3, 0, 0]} />
