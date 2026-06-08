@@ -97,6 +97,12 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
+const isNavActive = (to: string, pathname: string) => {
+  const depth = to.split("/").filter(Boolean).length;
+  if (depth <= 1) return pathname === to;
+  return pathname === to || pathname.startsWith(to + "/");
+};
+
 export const AppSidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -134,11 +140,7 @@ export const AppSidebar = () => {
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton
                     asChild
-                    isActive={
-                      item.to === "/"
-                        ? location.pathname === item.to
-                        : location.pathname.startsWith(item.to)
-                    }
+                    isActive={isNavActive(item.to, location.pathname)}
                     tooltip={item.label}
                   >
                     <NavLink to={item.to}>
