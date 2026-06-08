@@ -4,7 +4,6 @@ import {
   MapPin,
   ShieldCheck,
   ShieldOff,
-  Sprout,
   UserCheck,
   Users2,
   XCircle,
