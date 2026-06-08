@@ -105,7 +105,6 @@ export const AppRouter = () => {
               path={ROUTES.INSTITUTION_LOANS}
               element={<InstitutionLoansPage />}
             />
-            <Route path={ROUTES.YIELD_VERIFICATION} element={<AdminYieldsPage />} />
           </Route>
 
           {/* COOPERATIVE */}
@@ -114,6 +113,10 @@ export const AppRouter = () => {
               path={ROUTES.COOPERATIVE_DASHBOARD}
               element={<CooperativeDashboard />}
             />
+          </Route>
+
+          {/* YIELD VERIFICATION — shared by COOPERATIVE_MANAGER and INSTITUTION */}
+          <Route element={<RoleGuard allowedRoles={["COOPERATIVE_MANAGER", "INSTITUTION"]} />}>
             <Route path={ROUTES.YIELD_VERIFICATION} element={<AdminYieldsPage />} />
           </Route>
 
