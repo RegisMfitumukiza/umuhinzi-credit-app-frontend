@@ -1,6 +1,6 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/shared/components/ui/button";
@@ -16,6 +16,7 @@ import {
 } from "@/shared/components/ui/select";
 
 import { useCreateLoanApplication } from "../hooks/useCreateLoanApplication";
+import { useActiveInstitutions } from "../hooks/useActiveInstitutions";
 import {
   createLoanApplicationSchema,
   type CreateLoanApplicationSchemaType,
@@ -26,8 +27,19 @@ interface Props {
   onSuccess?: () => void;
 }
 
+const INSTITUTION_TYPE_LABELS: Record<string, string> = {
+  SACCO: "SACCO",
+  MICROFINANCE: "Microfinance",
+  BANK: "Bank",
+  NGO: "NGO",
+  GOVERNMENT_PROGRAM: "Government Program",
+  OTHER: "Other",
+};
+
 export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
   const { mutate, isPending } = useCreateLoanApplication();
+  const { data: institutionsData } = useActiveInstitutions();
+  const institutions = institutionsData?.data ?? [];
 
   const {
     register,
@@ -38,6 +50,7 @@ export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
   } = useForm<CreateLoanApplicationSchemaType>({
     resolver: zodResolver(createLoanApplicationSchema),
     defaultValues: {
+      institutionId: undefined,
       requestedAmount: undefined,
       purpose: undefined,
       purposeDescription: "",
@@ -47,6 +60,7 @@ export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
   const onSubmit = (values: CreateLoanApplicationSchemaType) => {
     const payload = {
       ...values,
+      institutionId: values.institutionId || undefined,
       purposeDescription: values.purposeDescription || undefined,
     };
     mutate(payload, {
@@ -61,6 +75,43 @@ export const CreateLoanApplicationForm = ({ onSuccess }: Props) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Institution picker */}
+      <div className="space-y-1.5">
+        <Label>Institution</Label>
+        {institutions.length === 0 ? (
+          <div className="flex items-center gap-2 rounded-md border border-dashed px-3 py-2.5 text-sm text-muted-foreground">
+            <Building2 className="h-4 w-4 shrink-0" />
+            <span>No registered institutions available yet. Your application will enter the general queue.</span>
+          </div>
+        ) : (
+          <Controller
+            name="institutionId"
+            control={control}
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an institution (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {institutions.map((inst) => (
+                    <SelectItem key={inst.id} value={inst.id}>
+                      <span className="font-medium">{inst.name}</span>
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {INSTITUTION_TYPE_LABELS[inst.type] ?? inst.type}
+                        {inst.district ? ` · ${inst.district}` : ""}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        )}
+        {errors.institutionId && (
+          <p className="text-sm text-destructive">{errors.institutionId.message}</p>
+        )}
+      </div>
+
       <div className="space-y-1.5">
         <Label htmlFor="requestedAmount">Requested amount (RWF)</Label>
         <Input

@@ -180,6 +180,7 @@ export type CreateLoanApplicationPayload = {
   requestedAmount: number;
   purpose: LoanPurpose;
   purposeDescription?: string;
+  institutionId?: string;
 };
 
 export type UpdateLoanApplicationStatusPayload = {

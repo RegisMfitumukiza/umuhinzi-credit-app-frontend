@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const createLoanApplicationSchema = z.object({
+  institutionId: z.uuid().optional(),
   requestedAmount: z.number().positive("Amount must be greater than 0"),
   purpose: z.enum([
     "SEEDS",
@@ -33,7 +34,7 @@ export const updateLoanApplicationStatusSchema = z
   .superRefine((data, ctx) => {
     if (data.status === "REJECTED" && !data.rejectionReason) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Rejection reason is required",
         path: ["rejectionReason"],
       });
@@ -60,12 +61,10 @@ export const updateLoanStatusSchema = z.object({
 export type UpdateLoanStatusSchemaType = z.infer<typeof updateLoanStatusSchema>;
 
 export const createRepaymentSchema = z.object({
-  loanId: z.string().uuid("Invalid loan ID"),
+  loanId: z.uuid("Invalid loan ID"),
   repaymentScheduleId: z
-    .string()
-    .uuid("Invalid schedule ID")
-    .optional()
-    .or(z.literal("")),
+    .union([z.uuid("Invalid schedule ID"), z.literal("")])
+    .optional(),
   amountPaid: z.number().positive("Amount must be greater than 0"),
   paymentMethod: z.enum([
     "MOBILE_MONEY",

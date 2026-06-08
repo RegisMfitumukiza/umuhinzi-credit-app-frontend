@@ -19,6 +19,21 @@ import type {
 
 type PagedResponse<T> = ApiResponse<T[]> & { pagination: LoanPagination };
 
+/* ─── Active Institutions (for loan application picker) ─── */
+
+export type ActiveInstitution = {
+  id: string;
+  name: string;
+  type: string;
+  district: string | null;
+  province: string | null;
+};
+
+export const getActiveInstitutions = async (): Promise<ApiResponse<ActiveInstitution[]>> => {
+  const { data } = await api.get<ApiResponse<ActiveInstitution[]>>("/institutions/active");
+  return data;
+};
+
 /* ─── Loan Applications ─── */
 
 export const createLoanApplication = async (

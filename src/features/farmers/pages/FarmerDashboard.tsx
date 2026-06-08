@@ -1,4 +1,4 @@
-import { Clock, ShieldOff, Tractor, Banknote, BarChart3, PawPrint, DollarSign, Lightbulb, Coins, Activity } from "lucide-react";
+import { Clock, ShieldOff, Tractor, Banknote, BarChart3, PawPrint, DollarSign, Lightbulb, Coins, Activity, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
@@ -20,6 +20,9 @@ import { CASH_FLOW_LABELS } from "@/features/finance/types";
 import { useRecommendations } from "@/features/recommendations/hooks/useRecommendations";
 import { useMyInputCosts } from "@/features/inputCosts/hooks/useMyInputCosts";
 import { useProductivityDashboard } from "@/features/productivity/hooks/useProductivityDashboard";
+import { useLoanApplications } from "@/features/loans/hooks/useLoanApplications";
+import { useLoans } from "@/features/loans/hooks/useLoans";
+import { LOAN_APPLICATION_STATUS_LABELS } from "@/features/loans/types";
 
 const FarmerDashboard = () => {
   const { data: farmer, isLoading } = useMyFarmer();
@@ -113,28 +116,59 @@ const SuspendedBanner = () => (
 
 /* ─── Loans quick-access card ─── */
 
-const LoansCard = () => (
-  <Card>
-    <CardContent className="flex items-center justify-between gap-4 py-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-          <Banknote className="h-5 w-5 text-blue-700" />
+const LoansCard = () => {
+  const { data: applicationsData } = useLoanApplications({ limit: 1 });
+  const { data: loansData } = useLoans({ limit: 1 });
+
+  const latestApp = applicationsData?.data?.[0] ?? null;
+  const activeLoans = loansData?.pagination?.total ?? 0;
+
+  let subtitle: string;
+  let accent = "bg-blue-100";
+  let iconColor = "text-blue-700";
+  let showAlert = false;
+
+  if (latestApp && latestApp.status === "PENDING") {
+    subtitle = "Application pending — waiting for an institution to review";
+    accent = "bg-amber-100";
+    iconColor = "text-amber-700";
+    showAlert = true;
+  } else if (latestApp && latestApp.status === "UNDER_REVIEW") {
+    subtitle = `Application under review by ${latestApp.institution?.name ?? "an institution"}`;
+    accent = "bg-indigo-100";
+    iconColor = "text-indigo-700";
+  } else if (activeLoans > 0) {
+    subtitle = `${activeLoans} active loan${activeLoans !== 1 ? "s" : ""} — track repayments and schedule`;
+  } else if (latestApp) {
+    subtitle = `Last application: ${LOAN_APPLICATION_STATUS_LABELS[latestApp.status].toLowerCase()}`;
+  } else {
+    subtitle = "Apply for credit, track repayments, and view your loan schedule";
+  }
+
+  return (
+    <Card className={showAlert ? "border-amber-200 bg-amber-50/40" : undefined}>
+      <CardContent className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className={`flex h-10 w-10 items-center justify-center rounded-full ${accent}`}>
+            {showAlert
+              ? <AlertCircle className={`h-5 w-5 ${iconColor}`} />
+              : <Banknote className={`h-5 w-5 ${iconColor}`} />
+            }
+          </div>
+          <div>
+            <p className="font-medium">Agricultural loans</p>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          </div>
         </div>
-        <div>
-          <p className="font-medium">Agricultural loans</p>
-          <p className="text-sm text-muted-foreground">
-            Apply for credit, track repayments, and view your loan schedule
-          </p>
-        </div>
-      </div>
-      <Button asChild variant="outline" className="shrink-0">
-        <Link to={ROUTES.FARMER_LOANS}>
-          View loans
-        </Link>
-      </Button>
-    </CardContent>
-  </Card>
-);
+        <Button asChild variant={showAlert ? "outline" : "outline"} className="shrink-0">
+          <Link to={ROUTES.FARMER_LOANS}>
+            {activeLoans > 0 ? "View loans" : latestApp ? "View application" : "Apply now"}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 /* ─── Farms quick-access card ─── */
 
