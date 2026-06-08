@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Sprout,
@@ -143,10 +143,10 @@ export const AppSidebar = () => {
                     isActive={isNavActive(item.to, location.pathname)}
                     tooltip={item.label}
                   >
-                    <NavLink to={item.to}>
+                    <Link to={item.to}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
-                    </NavLink>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -167,10 +167,10 @@ export const AppSidebar = () => {
                     isActive={location.pathname === item.to}
                     tooltip={item.label}
                   >
-                    <NavLink to={item.to}>
+                    <Link to={item.to}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
-                    </NavLink>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
