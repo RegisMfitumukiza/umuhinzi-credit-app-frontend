@@ -77,11 +77,18 @@ export const MembersSection = ({ cooperativeId, hasPendingRequests = false }: Pr
             No pending join requests.
           </p>
         ) : (
-          <div className="space-y-2">
-            {pending.map((m) => (
-              <PendingRequestRow key={m.id} member={m} />
-            ))}
-          </div>
+          <>
+            {pending.length > 5 && (
+              <p className="mb-2 text-xs text-muted-foreground">
+                {pending.length} requests — scroll to see all
+              </p>
+            )}
+            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+              {pending.map((m) => (
+                <PendingRequestRow key={m.id} member={m} />
+              ))}
+            </div>
+          </>
         )}
       </TabsContent>
     </Tabs>

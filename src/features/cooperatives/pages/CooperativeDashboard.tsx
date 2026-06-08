@@ -2,12 +2,17 @@ import {
   AlertCircle,
   Clock,
   MapPin,
+  ShieldCheck,
   ShieldOff,
   Sprout,
   UserCheck,
   Users2,
   XCircle,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/shared/components/ui/button";
+import { ROUTES } from "@/shared/constants/routes";
+import { useAllYields } from "@/features/productivity/hooks/useAllYields";
 
 import { AppLoader } from "@/shared/components/common/AppLoader";
 import { Badge } from "@/shared/components/ui/badge";
@@ -190,6 +195,7 @@ const SuspendedView = ({ cooperative }: { cooperative: Cooperative }) => (
 const ActiveView = ({ cooperative }: { cooperative: Cooperative }) => {
   const { data: membersData } = useCooperativeMembers({ limit: 100 });
   const { data: allFarms = [] } = useMemberFarms();
+  const { data: pendingYieldsData } = useAllYields({ verificationStatus: "PENDING", limit: 1 });
 
   const activeMembers =
     membersData?.members.filter((m) => m.status === "ACTIVE") ?? [];
@@ -200,6 +206,7 @@ const ActiveView = ({ cooperative }: { cooperative: Cooperative }) => {
       f.locationVerificationStatus === "PENDING" ||
       f.locationVerificationStatus === "UNVERIFIED"
   );
+  const pendingYields = pendingYieldsData?.pagination.total ?? 0;
 
   return (
     <div className="space-y-6">
@@ -228,8 +235,37 @@ const ActiveView = ({ cooperative }: { cooperative: Cooperative }) => {
           value={farmsToVerify.length}
           alert={farmsToVerify.length > 0}
         />
-        <StatCard icon={Sprout} label="Total member farms" value={allFarms.length} />
+        <StatCard
+          icon={ShieldCheck}
+          label="Yields to verify"
+          value={pendingYields}
+          alert={pendingYields > 0}
+        />
       </div>
+
+      {/* Yield verification quick-link */}
+      <Card>
+        <CardContent className="flex items-center justify-between gap-4 py-4">
+          <div className="flex items-center gap-3">
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${pendingYields > 0 ? "bg-amber-100" : "bg-muted"}`}>
+              <ShieldCheck className={`h-5 w-5 ${pendingYields > 0 ? "text-amber-700" : "text-muted-foreground"}`} />
+            </div>
+            <div>
+              <p className="font-medium">Yield verification</p>
+              <p className="text-sm text-muted-foreground">
+                {pendingYields > 0
+                  ? `${pendingYields} member yield${pendingYields !== 1 ? "s" : ""} waiting for your review`
+                  : "No yields pending verification from your members"}
+              </p>
+            </div>
+          </div>
+          <Button asChild variant={pendingYields > 0 ? "default" : "outline"} className="shrink-0">
+            <Link to={ROUTES.YIELD_VERIFICATION}>
+              {pendingYields > 0 ? "Review now" : "View all"}
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Info + Members grid */}
       <div className="grid gap-6 lg:grid-cols-5">
