@@ -12,7 +12,7 @@ export const useLogout = () => {
 
         onSettled: () => {
             authStorage.clear();
-            queryClient.setQueryData(["auth-user"], null);
+            queryClient.clear();
         }
     })
 }
