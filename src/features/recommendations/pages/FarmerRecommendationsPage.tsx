@@ -26,7 +26,7 @@ const TYPE_OPTIONS = [
 ];
 
 const FarmerRecommendationsPage = () => {
-  const [statusTab, setStatusTab] = useState<RecommendationStatus | "ALL">("ALL");
+  const [statusTab, setStatusTab] = useState<RecommendationStatus | "ALL">("ACTIVE");
   const [typeFilter, setTypeFilter] = useState<RecommendationType | "ALL">("ALL");
 
   const { data, isLoading } = useRecommendations({
@@ -35,8 +35,10 @@ const FarmerRecommendationsPage = () => {
     type: typeFilter === "ALL" ? undefined : typeFilter,
   });
 
+  const { data: activeData } = useRecommendations({ status: "ACTIVE", limit: 50 });
+
   const recommendations = data?.recommendations ?? [];
-  const activeCount = recommendations.filter((r) => r.status === "ACTIVE").length;
+  const activeCount = activeData?.recommendations.length ?? 0;
 
   return (
     <div className="space-y-6">
