@@ -76,6 +76,24 @@ export const discoverCooperatives = async (params?: {
   return data;
 };
 
+/* ── Farmer search (cooperative manager / institution) ── */
+
+export type FarmerSearchResult = {
+  id: string;
+  status: string;
+  user: { fullName: string; phone: string | null; email: string; district: string | null };
+};
+
+export const searchFarmersApi = async (
+  q: string
+): Promise<{ success: boolean; data: FarmerSearchResult[] }> => {
+  const { data } = await api.get<{ success: boolean; data: FarmerSearchResult[] }>(
+    "/farmers/search",
+    { params: { q } }
+  );
+  return data;
+};
+
 /* ── Admin: all farmers ── */
 
 export const getAllFarmers = async (params?: {
