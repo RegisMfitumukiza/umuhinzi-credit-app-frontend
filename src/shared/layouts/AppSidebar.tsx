@@ -77,6 +77,7 @@ const roleNavItems: Record<UserRole, NavItem[]> = {
   COOPERATIVE_MANAGER: [
     { label: "Dashboard", icon: Users, to: ROUTES.COOPERATIVE_DASHBOARD },
     { label: "Yield Verification", icon: ShieldCheck, to: ROUTES.YIELD_VERIFICATION },
+    { label: "Market Prices", icon: ShoppingCart, to: ROUTES.COOPERATIVE_MARKET_PRICES },
   ],
   GOVERNMENT_PARTNER: [
     { label: "Dashboard", icon: Landmark, to: ROUTES.GOVERNMENT_DASHBOARD },

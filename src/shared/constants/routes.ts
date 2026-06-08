@@ -48,6 +48,8 @@ export const ROUTES = {
 
   ADMIN_RECOMMENDATIONS: "/admin/recommendations",
 
+  COOPERATIVE_MARKET_PRICES: "/cooperative/market-prices",
+
   INSTITUTION_LOANS: "/institution/loans",
 
   PROFILE: "/profile",

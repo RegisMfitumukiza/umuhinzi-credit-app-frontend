@@ -113,6 +113,10 @@ export const AppRouter = () => {
               path={ROUTES.COOPERATIVE_DASHBOARD}
               element={<CooperativeDashboard />}
             />
+            <Route
+              path={ROUTES.COOPERATIVE_MARKET_PRICES}
+              element={<AdminMarketPricesPage />}
+            />
           </Route>
 
           {/* YIELD VERIFICATION — shared by COOPERATIVE_MANAGER and INSTITUTION */}
